@@ -13,6 +13,7 @@ import DelegatesPage  from '@/pages/Delegates'
 import AlertsPage     from '@/pages/Alerts'
 import SponsorsPage   from '@/pages/Sponsors'
 import SwagBagPage    from '@/pages/SwagBag'
+import ReportsPage    from '@/pages/Reports'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
@@ -70,6 +71,7 @@ export default function App() {
           <Route path="alerts"     element={<AlertsPage />} />
           <Route path="sponsors"   element={<SponsorsPage />} />
           <Route path="swag-bag"   element={<SwagBagPage />} />
+          <Route path="reports"    element={<ReportsPage />} />
         </Route>
 
         {/* 404 */}
