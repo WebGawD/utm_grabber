@@ -28,6 +28,7 @@ if ( ! defined( 'AWSISA_SUPABASE_SERVICE_KEY' ) )  define( 'AWSISA_SUPABASE_SERV
 // Load includes.
 require_once AWSISA_EVENTS_PATH . 'includes/rest-api.php';
 require_once AWSISA_EVENTS_PATH . 'includes/rest-contact.php';
+require_once AWSISA_EVENTS_PATH . 'includes/rest-swag.php';
 require_once AWSISA_EVENTS_PATH . 'includes/shortcodes.php';
 require_once AWSISA_EVENTS_PATH . 'includes/email.php';
 
@@ -197,6 +198,7 @@ define( 'AWSISA_SUPABASE_SERVICE_KEY', 'your-service-role-key' );
 				<tr><td>POST</td><td><code>/payment/peachpayments</code></td><td><?php esc_html_e( 'Peachpayments webhook handler.', 'awsisa-events' ); ?></td></tr>
 				<tr><td>GET</td><td><code>/agenda</code></td><td><?php esc_html_e( 'Fetch published agenda sessions.', 'awsisa-events' ); ?></td></tr>
 				<tr><td>GET</td><td><code>/sponsors</code></td><td><?php esc_html_e( 'Fetch active sponsors.', 'awsisa-events' ); ?></td></tr>
+				<tr><td>GET</td><td><code>/swag-bag/{id}/download</code></td><td><?php esc_html_e( 'Track swag item download and redirect to file URL.', 'awsisa-events' ); ?></td></tr>
 			</tbody>
 		</table>
 	</div>
