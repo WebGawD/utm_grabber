@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "admin-pwa",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "admin-pwa"],
+      "port": 5173
+    },
+    {
+      "name": "registration-form-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "forms/registration"],
+      "port": 5174
+    },
+    {
+      "name": "registration-form-build",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "build", "--prefix", "forms/registration"],
+      "port": 5174
+    }
+  ]
+}

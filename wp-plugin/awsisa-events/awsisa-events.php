@@ -27,6 +27,7 @@ if ( ! defined( 'AWSISA_SUPABASE_SERVICE_KEY' ) )  define( 'AWSISA_SUPABASE_SERV
 
 // Load includes.
 require_once AWSISA_EVENTS_PATH . 'includes/rest-api.php';
+require_once AWSISA_EVENTS_PATH . 'includes/rest-contact.php';
 require_once AWSISA_EVENTS_PATH . 'includes/shortcodes.php';
 require_once AWSISA_EVENTS_PATH . 'includes/email.php';
 
