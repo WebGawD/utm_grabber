@@ -4,19 +4,19 @@
     {
       "name": "admin-pwa",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--prefix", "admin-pwa"],
+      "runtimeArgs": ["--prefix", "admin-pwa", "run", "dev"],
       "port": 5173
     },
     {
       "name": "registration-form-dev",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--prefix", "forms/registration"],
+      "runtimeArgs": ["--prefix", "forms/registration", "run", "dev"],
       "port": 5174
     },
     {
       "name": "registration-form-build",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "build", "--prefix", "forms/registration"],
+      "runtimeArgs": ["--prefix", "forms/registration", "run", "build"],
       "port": 5174
     }
   ]
