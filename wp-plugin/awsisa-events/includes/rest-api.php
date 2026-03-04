@@ -373,31 +373,129 @@ function awsisa_rest_get_accomm() {
 }
 
 // ============================================================
-// Payment Webhooks (Stubs)
+// Payment Webhooks
 // ============================================================
 
 /**
  * Handles PayFast ITN (Instant Transaction Notification).
  *
+ * Validation steps (per PayFast documentation):
+ *   1. Verify the request IP is from PayFast's published range.
+ *   2. Reconstruct the parameter string and verify the MD5 signature.
+ *   3. Confirm the transaction with PayFast's validate endpoint.
+ *   4. Update the correct Supabase record (donation or delegate).
+ *
+ * The donate form passes `m_payment_id = donation_uuid`.
+ * The registration flow passes `m_payment_id = delegate_uuid`.
+ * We try donations first, then delegates, so both work through one hook.
+ *
+ * Define in wp-config.php:
+ *   define( 'AWSISA_PAYFAST_PASSPHRASE', 'your-passphrase' );
+ *
  * @param WP_REST_Request $request Incoming request.
  * @return WP_REST_Response
  */
 function awsisa_rest_payfast_itn( WP_REST_Request $request ) {
-	// TODO: Validate PayFast signature before processing.
-	// See: https://developers.payfast.co.za/api#itn
+	// ── 1. IP allowlist (PayFast published ranges, updated 2024) ─────────────
+	$valid_ips = array(
+		'197.97.145.144', '197.97.145.145', '197.97.145.146', '197.97.145.147',
+		'41.74.179.194',  '41.74.179.195',
+		// Legacy range kept for compatibility:
+		'196.33.227.224', '196.33.227.225', '196.33.227.226', '196.33.227.227',
+		'196.33.227.228', '196.33.227.229', '196.33.227.230', '196.33.227.231',
+		'196.33.227.232', '196.33.227.233', '196.33.227.234', '196.33.227.235',
+		'196.33.227.236', '196.33.227.237', '196.33.227.238', '196.33.227.239',
+	);
+
+	$client_ip = awsisa_get_client_ip();
+
+	// In WP_DEBUG mode (local dev) skip IP check so you can test via Postman.
+	if ( ! WP_DEBUG && ! in_array( $client_ip, $valid_ips, true ) ) {
+		error_log( 'AWSISA PayFast ITN: rejected IP ' . $client_ip );
+		return new WP_REST_Response( 'Forbidden', 403 );
+	}
 
 	$body = $request->get_body_params();
 
-	$payment_status = isset( $body['payment_status'] ) ? sanitize_text_field( $body['payment_status'] ) : '';
-	$m_payment_id   = isset( $body['m_payment_id'] )   ? sanitize_text_field( $body['m_payment_id'] )   : '';
+	// ── 2. Signature verification ────────────────────────────────────────────
+	// Build the parameter string in received order, excluding 'signature'.
+	$param_string = '';
+	foreach ( $body as $key => $value ) {
+		if ( 'signature' === $key ) {
+			continue;
+		}
+		$param_string .= $key . '=' . urlencode( stripslashes( trim( $value ) ) ) . '&';
+	}
+	$param_string = rtrim( $param_string, '&' );
 
-	if ( 'COMPLETE' === $payment_status && ! empty( $m_payment_id ) ) {
-		// Update delegate payment status.
-		awsisa_supabase( 'delegates', 'PATCH', array(
-			'payment_status'      => 'paid',
-			'payment_ref'         => $m_payment_id,
-			'registration_status' => 'confirmed',
-		), 'payment_ref=eq.' . rawurlencode( $m_payment_id ), true );
+	$passphrase = defined( 'AWSISA_PAYFAST_PASSPHRASE' ) ? AWSISA_PAYFAST_PASSPHRASE : '';
+	if ( ! empty( $passphrase ) ) {
+		$param_string .= '&passphrase=' . urlencode( trim( $passphrase ) );
+	}
+
+	$expected_sig = md5( $param_string );
+	$received_sig = sanitize_text_field( $body['signature'] ?? '' );
+
+	if ( ! hash_equals( $expected_sig, $received_sig ) ) {
+		error_log( 'AWSISA PayFast ITN: signature mismatch.' );
+		return new WP_REST_Response( 'Invalid signature', 400 );
+	}
+
+	// ── 3. Server-side validation with PayFast ───────────────────────────────
+	$sandbox       = ( defined( 'AWSISA_PAYFAST_SANDBOX' ) && AWSISA_PAYFAST_SANDBOX );
+	$validate_host = $sandbox
+		? 'https://sandbox.payfast.co.za/eng/query/validate'
+		: 'https://www.payfast.co.za/eng/query/validate';
+
+	// Re-build param string WITHOUT the passphrase for the validate call.
+	$validate_string = '';
+	foreach ( $body as $key => $value ) {
+		if ( 'signature' === $key ) continue;
+		$validate_string .= $key . '=' . urlencode( stripslashes( trim( $value ) ) ) . '&';
+	}
+	$validate_string = rtrim( $validate_string, '&' );
+
+	$validate_response = wp_remote_post( $validate_host, array(
+		'body'    => $validate_string,
+		'headers' => array( 'Content-Type' => 'application/x-www-form-urlencoded' ),
+		'timeout' => 20,
+	) );
+
+	if ( is_wp_error( $validate_response ) ) {
+		error_log( 'AWSISA PayFast ITN: validation request failed — ' . $validate_response->get_error_message() );
+		// Accept anyway in case PayFast's validator is temporarily down; log for review.
+	} elseif ( trim( wp_remote_retrieve_body( $validate_response ) ) !== 'VALID' ) {
+		error_log( 'AWSISA PayFast ITN: PayFast returned INVALID for m_payment_id ' . ( $body['m_payment_id'] ?? '' ) );
+		return new WP_REST_Response( 'Not validated', 400 );
+	}
+
+	// ── 4. Update Supabase record ────────────────────────────────────────────
+	$payment_status = sanitize_text_field( $body['payment_status'] ?? '' );
+	$m_payment_id   = sanitize_text_field( $body['m_payment_id']   ?? '' );  // This is our UUID.
+	$pf_payment_id  = sanitize_text_field( $body['pf_payment_id']  ?? '' );  // PayFast's own ID.
+	$amount_gross   = sanitize_text_field( $body['amount_gross']   ?? '' );
+
+	if ( 'COMPLETE' !== $payment_status || empty( $m_payment_id ) ) {
+		// Not a completed payment — still return 200 so PayFast stops retrying.
+		return new WP_REST_Response( 'OK', 200 );
+	}
+
+	$patch_data = array(
+		'payment_status' => 'paid',
+		'payment_ref'    => $pf_payment_id,  // Store PayFast's ID as the reference.
+	);
+
+	// Try donations table first (donate form sets m_payment_id = donation UUID).
+	$donation_check = awsisa_supabase( 'donations', 'GET', array(), 'id=eq.' . rawurlencode( $m_payment_id ) . '&select=id&limit=1' );
+	if ( ! is_wp_error( $donation_check ) && ! empty( $donation_check ) ) {
+		awsisa_supabase( 'donations', 'PATCH', $patch_data, 'id=eq.' . rawurlencode( $m_payment_id ), true );
+	} else {
+		// Fall back to delegates table (registration flow sets m_payment_id = delegate UUID).
+		awsisa_supabase( 'delegates', 'PATCH',
+			array_merge( $patch_data, array( 'registration_status' => 'confirmed' ) ),
+			'id=eq.' . rawurlencode( $m_payment_id ),
+			true
+		);
 	}
 
 	// PayFast requires HTTP 200 to acknowledge receipt.
@@ -407,25 +505,74 @@ function awsisa_rest_payfast_itn( WP_REST_Request $request ) {
 /**
  * Handles Peachpayments webhook.
  *
+ * Peachpayments signs its webhook payload using HMAC-SHA256 with your
+ * webhook secret. The signature is sent in the X-Signature header.
+ *
+ * Define in wp-config.php:
+ *   define( 'AWSISA_PEACH_SECRET', 'your-peach-webhook-secret' );
+ *
+ * Payment IDs:
+ *   The registration form passes the delegate UUID as `merchantTransactionId`.
+ *   We update delegates (or donations) by matching that UUID.
+ *
  * @param WP_REST_Request $request Incoming request.
  * @return WP_REST_Response
  */
 function awsisa_rest_peach_webhook( WP_REST_Request $request ) {
-	// TODO: Validate Peachpayments webhook signature.
-	// See: https://developer.peachpayments.com/docs/webhooks
+	// ── 1. HMAC-SHA256 signature validation ──────────────────────────────────
+	$secret = defined( 'AWSISA_PEACH_SECRET' ) ? AWSISA_PEACH_SECRET : '';
 
+	if ( ! empty( $secret ) ) {
+		$raw_body          = $request->get_body();
+		$received_sig      = sanitize_text_field( $request->get_header( 'x-signature' ) ?? '' );
+		$expected_sig      = hash_hmac( 'sha256', $raw_body, $secret );
+
+		if ( ! hash_equals( $expected_sig, $received_sig ) ) {
+			error_log( 'AWSISA Peach webhook: signature mismatch.' );
+			return new WP_REST_Response( array( 'error' => 'Invalid signature' ), 401 );
+		}
+	} else {
+		// No secret configured — log a warning but don't hard-fail in case
+		// the site is still being set up.
+		error_log( 'AWSISA Peach webhook: AWSISA_PEACH_SECRET not defined. Skipping signature check.' );
+	}
+
+	// ── 2. Parse payload ─────────────────────────────────────────────────────
 	$body   = $request->get_json_params();
 	$result = isset( $body['result'] ) ? $body['result'] : array();
 	$code   = isset( $result['code'] ) ? $result['code'] : '';
 
-	// Peach success codes start with '000.000'.
-	if ( strpos( $code, '000.000' ) === 0 ) {
-		$ref = isset( $body['id'] ) ? sanitize_text_field( $body['id'] ) : '';
-		awsisa_supabase( 'delegates', 'PATCH', array(
-			'payment_status'      => 'paid',
-			'payment_ref'         => $ref,
-			'registration_status' => 'confirmed',
-		), 'payment_ref=eq.' . rawurlencode( $ref ), true );
+	// Peachpayments success result codes begin with '000.000' or '000.100'.
+	$is_success = ( strpos( $code, '000.000' ) === 0 || strpos( $code, '000.100' ) === 0 );
+
+	if ( ! $is_success ) {
+		// Not a success — acknowledge receipt and move on.
+		return new WP_REST_Response( array( 'status' => 'received' ), 200 );
+	}
+
+	// `merchantTransactionId` is the UUID we pass when initiating payment.
+	$our_id = sanitize_text_field( $body['merchantTransactionId'] ?? $body['id'] ?? '' );
+	$pf_ref = sanitize_text_field( $body['id'] ?? '' );
+
+	if ( empty( $our_id ) ) {
+		return new WP_REST_Response( array( 'status' => 'ok_no_id' ), 200 );
+	}
+
+	$patch_data = array(
+		'payment_status' => 'paid',
+		'payment_ref'    => $pf_ref,
+	);
+
+	// Try donations first, then delegates (same pattern as PayFast).
+	$donation_check = awsisa_supabase( 'donations', 'GET', array(), 'id=eq.' . rawurlencode( $our_id ) . '&select=id&limit=1' );
+	if ( ! is_wp_error( $donation_check ) && ! empty( $donation_check ) ) {
+		awsisa_supabase( 'donations', 'PATCH', $patch_data, 'id=eq.' . rawurlencode( $our_id ), true );
+	} else {
+		awsisa_supabase( 'delegates', 'PATCH',
+			array_merge( $patch_data, array( 'registration_status' => 'confirmed' ) ),
+			'id=eq.' . rawurlencode( $our_id ),
+			true
+		);
 	}
 
 	return new WP_REST_Response( array( 'status' => 'received' ), 200 );

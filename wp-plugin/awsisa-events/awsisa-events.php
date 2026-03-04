@@ -21,9 +21,20 @@ define( 'AWSISA_EVENTS_PATH',    plugin_dir_path( __FILE__ ) );
 define( 'AWSISA_EVENTS_URL',     plugin_dir_url( __FILE__ ) );
 
 // Supabase configuration (define these in wp-config.php).
-if ( ! defined( 'AWSISA_SUPABASE_URL' ) )         define( 'AWSISA_SUPABASE_URL',          '' );
-if ( ! defined( 'AWSISA_SUPABASE_ANON_KEY' ) )     define( 'AWSISA_SUPABASE_ANON_KEY',    '' );
-if ( ! defined( 'AWSISA_SUPABASE_SERVICE_KEY' ) )  define( 'AWSISA_SUPABASE_SERVICE_KEY', '' );
+if ( ! defined( 'AWSISA_SUPABASE_URL' ) )          define( 'AWSISA_SUPABASE_URL',          '' );
+if ( ! defined( 'AWSISA_SUPABASE_ANON_KEY' ) )     define( 'AWSISA_SUPABASE_ANON_KEY',     '' );
+if ( ! defined( 'AWSISA_SUPABASE_SERVICE_KEY' ) )  define( 'AWSISA_SUPABASE_SERVICE_KEY',  '' );
+
+// PayFast configuration (define these in wp-config.php).
+// Get these from your PayFast merchant dashboard: https://www.payfast.co.za
+if ( ! defined( 'AWSISA_PAYFAST_MERCHANT_ID' ) )  define( 'AWSISA_PAYFAST_MERCHANT_ID',  '' );
+if ( ! defined( 'AWSISA_PAYFAST_MERCHANT_KEY' ) ) define( 'AWSISA_PAYFAST_MERCHANT_KEY', '' );
+if ( ! defined( 'AWSISA_PAYFAST_PASSPHRASE' ) )   define( 'AWSISA_PAYFAST_PASSPHRASE',   '' );  // Set in PayFast dashboard Security settings.
+if ( ! defined( 'AWSISA_PAYFAST_SANDBOX' ) )      define( 'AWSISA_PAYFAST_SANDBOX',      false ); // Set true for testing.
+
+// Peachpayments configuration (define in wp-config.php).
+// Webhook secret from your Peachpayments dashboard.
+if ( ! defined( 'AWSISA_PEACH_SECRET' ) )         define( 'AWSISA_PEACH_SECRET',         '' );
 
 // Load includes.
 require_once AWSISA_EVENTS_PATH . 'includes/rest-api.php';
@@ -162,13 +173,48 @@ function awsisa_events_settings_page_html() {
 		<h2><?php esc_html_e( 'Configuration', 'awsisa-events' ); ?></h2>
 		<p>
 			<?php esc_html_e( 'Add the following constants to your', 'awsisa-events' ); ?>
-			<code>wp-config.php</code>:
+			<code>wp-config.php</code> (before the <code>/* That's all, stop editing! */</code> line):
 		</p>
-		<pre style="background:#f0f0f1;padding:1rem;border-radius:4px;overflow:auto;">
-define( 'AWSISA_SUPABASE_URL',         'https://your-project-id.supabase.co' );
+		<pre style="background:#f0f0f1;padding:1rem;border-radius:4px;overflow:auto;font-size:.8rem;">
+// ── Supabase ─────────────────────────────────────────────────────────────
+define( 'AWSISA_SUPABASE_URL',         'https://YOUR_PROJECT_ID.supabase.co' );
 define( 'AWSISA_SUPABASE_ANON_KEY',    'your-anon-public-key' );
 define( 'AWSISA_SUPABASE_SERVICE_KEY', 'your-service-role-key' );
+
+// ── PayFast ───────────────────────────────────────────────────────────────
+define( 'AWSISA_PAYFAST_MERCHANT_ID',  '10000100' );   // From PayFast dashboard
+define( 'AWSISA_PAYFAST_MERCHANT_KEY', 'test' );       // From PayFast dashboard
+define( 'AWSISA_PAYFAST_PASSPHRASE',   'your-passphrase' ); // Set in PayFast Security settings
+define( 'AWSISA_PAYFAST_SANDBOX',      false );        // true for sandbox testing
+
+// ── Peachpayments ─────────────────────────────────────────────────────────
+define( 'AWSISA_PEACH_SECRET',         'your-webhook-secret' ); // From Peach dashboard
 		</pre>
+
+		<?php
+		// Live connection status for all services.
+		$sb_ok = ! empty( AWSISA_SUPABASE_URL ) && ! empty( AWSISA_SUPABASE_ANON_KEY );
+		$pf_ok = ! empty( AWSISA_PAYFAST_MERCHANT_ID );
+		$pp_ok = ! empty( AWSISA_PEACH_SECRET );
+
+		$rows = array(
+			array( 'Supabase',       $sb_ok, $sb_ok ? AWSISA_SUPABASE_URL : 'Not configured' ),
+			array( 'PayFast',        $pf_ok, $pf_ok ? 'Merchant ID: ' . AWSISA_PAYFAST_MERCHANT_ID . ( AWSISA_PAYFAST_SANDBOX ? ' (SANDBOX)' : ' (LIVE)' ) : 'Not configured' ),
+			array( 'Peachpayments',  $pp_ok, $pp_ok ? 'Secret configured' : 'Not configured' ),
+		);
+		?>
+		<table class="widefat striped" style="margin-top:1rem;">
+			<thead><tr><th><?php esc_html_e( 'Service', 'awsisa-events' ); ?></th><th><?php esc_html_e( 'Status', 'awsisa-events' ); ?></th><th><?php esc_html_e( 'Detail', 'awsisa-events' ); ?></th></tr></thead>
+			<tbody>
+				<?php foreach ( $rows as list( $svc, $ok, $detail ) ) : ?>
+					<tr>
+						<td><strong><?php echo esc_html( $svc ); ?></strong></td>
+						<td><?php echo $ok ? '✅ Configured' : '❌ Missing'; ?></td>
+						<td style="color:#666;"><?php echo esc_html( $detail ); ?></td>
+					</tr>
+				<?php endforeach; ?>
+			</tbody>
+		</table>
 
 		<h2><?php esc_html_e( 'Available Shortcodes', 'awsisa-events' ); ?></h2>
 		<table class="widefat striped">

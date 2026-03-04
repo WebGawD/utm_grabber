@@ -43,14 +43,7 @@ if ( $delegate_id && defined( 'AWSISA_SUPABASE_URL' ) && AWSISA_SUPABASE_URL ) {
 		'blocking' => false,
 	) );
 
-	// Fetch public-safe fields only.
-	$result = awsisa_supabase_request(
-		'/rest/v1/delegates',
-		array( 'method' => 'GET' )
-	);
-
-	// Use the theme helper (awsisa_supabase_request has a different signature —
-	// call Supabase directly via wp_remote_get for this query).
+	// Fetch public-safe fields only (direct wp_remote_get — finer query control).
 	$url  = rtrim( AWSISA_SUPABASE_URL, '/' )
 		. '/rest/v1/delegates'
 		. '?id=eq.' . rawurlencode( $delegate_id )
