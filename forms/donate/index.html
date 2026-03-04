@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Donation Form — Dev Harness</title>
+    <style>
+      *, *::before, *::after { box-sizing: border-box; }
+      body { font-family: 'Inter', system-ui, sans-serif; background: #F8FAFC; margin: 0; padding: 2rem 1rem; color: #0F172A; }
+      .form-control { display: block; width: 100%; padding: .625rem .875rem; border: 1.5px solid #CBD5E1; border-radius: 8px; font-size: .9rem; outline: none; transition: border-color .15s; }
+      .form-control:focus { border-color: #16A34A; }
+      .btn { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; padding: .625rem 1.25rem; border-radius: 8px; font-weight: 600; font-size: .9rem; cursor: pointer; border: 2px solid transparent; transition: all .15s; }
+      .btn--primary { background: #0D9488; color: #fff; border-color: #0D9488; }
+      .btn--outline { background: transparent; color: #0D9488; border-color: #0D9488; }
+      .btn:disabled { opacity: .5; cursor: not-allowed; }
+      .popia-block { background: #FFF7ED; border: 1px solid #FED7AA; border-radius: 8px; padding: 1rem; }
+      .harness-badge { display: inline-block; background: #FEF3C7; color: #92400E; font-size: .7rem; font-weight: 700; padding: .2rem .6rem; border-radius: 20px; margin-bottom: 1.5rem; }
+    </style>
+    <script>
+      window.awsisaDonate = {
+        supabaseUrl:       'https://placeholder.supabase.co',
+        supabaseKey:       'placeholder-key',
+        restUrl:           'http://localhost:8080/wp-json/awsisa/v1',
+        nonce:             'dev-nonce',
+        payfastMerchant:   '',
+        payfastKey:        '',
+        payfastSandbox:    true,
+        privacyUrl:        '/privacy-policy/',
+        successUrl:        '/donate/thank-you/',
+        cancelUrl:         '/donate/',
+      }
+    </script>
+  </head>
+  <body>
+    <div style="max-width: 620px; margin: 0 auto;">
+      <span class="harness-badge">⚙️ Dev Harness — not WordPress</span>
+      <div id="donate-app"></div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

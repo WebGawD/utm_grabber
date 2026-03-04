@@ -3,44 +3,44 @@
   "configurations": [
     {
       "name": "admin-pwa",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "admin-pwa", "run", "dev"],
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["scripts/start-admin-pwa.sh"],
       "port": 5173
     },
     {
       "name": "registration-form-dev",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "forms/registration", "run", "dev"],
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["scripts/start-registration-dev.sh"],
       "port": 5174
     },
     {
       "name": "donate-form-dev",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "forms/donate", "run", "dev"],
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["scripts/start-donate-dev.sh"],
       "port": 5175
     },
     {
       "name": "accommodation-form-dev",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "forms/accommodation", "run", "dev"],
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["scripts/start-accommodation-dev.sh"],
       "port": 5176
     },
     {
       "name": "registration-form-build",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "forms/registration", "run", "build"],
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["scripts/build-registration.sh"],
       "port": 5174
     },
     {
       "name": "donate-form-build",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "forms/donate", "run", "build"],
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["scripts/build-donate.sh"],
       "port": 5175
     },
     {
       "name": "accommodation-form-build",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "forms/accommodation", "run", "build"],
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["scripts/build-accommodation.sh"],
       "port": 5176
     }
   ]

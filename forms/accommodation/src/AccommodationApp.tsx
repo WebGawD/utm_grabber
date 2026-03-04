@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { AccomPackage } from './types'
-import type './types'
+import './types'
 
 type Stage = 'select' | 'details' | 'processing' | 'success' | 'error'
 

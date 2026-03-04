@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import type './types'
+import './types'
 
 type Stage = 'form' | 'processing' | 'success' | 'error'
 
