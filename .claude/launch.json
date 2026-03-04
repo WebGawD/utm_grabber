@@ -14,10 +14,34 @@
       "port": 5174
     },
     {
+      "name": "donate-form-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "forms/donate", "run", "dev"],
+      "port": 5175
+    },
+    {
+      "name": "accommodation-form-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "forms/accommodation", "run", "dev"],
+      "port": 5176
+    },
+    {
       "name": "registration-form-build",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["--prefix", "forms/registration", "run", "build"],
       "port": 5174
+    },
+    {
+      "name": "donate-form-build",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "forms/donate", "run", "build"],
+      "port": 5175
+    },
+    {
+      "name": "accommodation-form-build",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "forms/accommodation", "run", "build"],
+      "port": 5176
     }
   ]
 }
