@@ -98,13 +98,11 @@ export default function Reports() {
       } else if (type === 'donations') {
         rows = donations.map(d => ({
           id:           d.id,
-          first_name:   d.first_name,
-          last_name:    d.last_name,
-          email:        d.email,
-          organisation: d.organisation ?? '',
+          donor_name:   d.is_anonymous ? 'Anonymous' : d.donor_name,
+          donor_email:  d.is_anonymous ? '' : d.donor_email,
           amount_zar:   d.amount_zar,
           is_anonymous: d.is_anonymous ? 'Yes' : 'No',
-          status:       d.status,
+          status:       d.payment_status,
           donated_at:   format(new Date(d.created_at), 'yyyy-MM-dd HH:mm'),
         }))
         filename = `awsisa-donations-${format(new Date(), 'yyyyMMdd')}.csv`
@@ -289,12 +287,12 @@ export default function Reports() {
                 {donations.map(d => (
                   <tr key={d.id} className="border-b border-slate-700/50 hover:bg-slate-700/30">
                     <td className="py-2 pr-4 text-white font-medium">
-                      {d.is_anonymous ? <span className="text-slate-500 italic">Anonymous</span> : `${d.first_name} ${d.last_name}`}
+                      {d.is_anonymous ? <span className="text-slate-500 italic">Anonymous</span> : d.donor_name}
                     </td>
-                    <td className="py-2 pr-4 text-slate-300">{d.is_anonymous ? '—' : d.email}</td>
+                    <td className="py-2 pr-4 text-slate-300">{d.is_anonymous ? '—' : d.donor_email}</td>
                     <td className="py-2 pr-4 text-emerald-400 font-bold">R {d.amount_zar?.toLocaleString()}</td>
                     <td className="py-2 pr-4">
-                      <span className={`badge-${d.status === 'complete' ? 'success' : 'warning'}`}>{d.status}</span>
+                      <span className={`badge-${d.payment_status === 'completed' ? 'success' : 'warning'}`}>{d.payment_status}</span>
                     </td>
                     <td className="py-2 text-slate-400 text-xs">{format(new Date(d.created_at), 'dd MMM yyyy')}</td>
                   </tr>

@@ -2,7 +2,7 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import {
   LayoutDashboard, QrCode, Users, Bell, Building2,
-  Gift, LogOut, Menu, X, Wifi, WifiOff, AlertCircle, BarChart2,
+  Gift, LogOut, Menu, Wifi, WifiOff, AlertCircle, BarChart2,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { getQueueSize } from '@/hooks/useOfflineQueue'
