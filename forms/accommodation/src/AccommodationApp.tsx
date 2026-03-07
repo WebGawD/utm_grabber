@@ -39,11 +39,11 @@ export default function AccommodationApp() {
   useEffect(() => {
     if (!cfg?.supabaseUrl) { setLoadingPkgs(false); return }
 
-    fetch(`${cfg.supabaseUrl}/rest/v1/accommodation_packages?is_active=eq.true&order=price_per_night_zar.asc`, {
+    fetch(`${cfg.supabaseUrl}/rest/v1/accommodation_packages?is_active=eq.true&order=price_zar.asc`, {
       headers: { apikey: cfg.supabaseKey, Authorization: `Bearer ${cfg.supabaseKey}` },
     })
       .then(r => r.json())
-      .then((d: AccomPackage[]) => setPackages(d))
+      .then((d: unknown) => setPackages(Array.isArray(d) ? d as AccomPackage[] : []))
       .catch(() => {})
       .finally(() => setLoadingPkgs(false))
   }, [])
@@ -117,8 +117,8 @@ export default function AccommodationApp() {
 
   /* ── stage: details ── */
   if (stage === 'details' && selected) {
-    const totalZar = selected.price_per_night_zar * nights
-    const totalUsd = selected.price_per_night_usd * nights
+    const totalZar = selected.price_zar * nights
+    const totalUsd = selected.price_usd * nights
     const amenities: string[] = Array.isArray(selected.amenities)
       ? selected.amenities
       : JSON.parse(selected.amenities || '[]')
@@ -282,10 +282,10 @@ export default function AccommodationApp() {
                 </div>
                 <div style={{ textAlign: 'right', flexShrink: 0 }}>
                   <div style={{ fontWeight: 800, fontSize: '1.375rem', color: '#0D9488' }}>
-                    R {pkg.price_per_night_zar.toLocaleString()}
+                    R {pkg.price_zar.toLocaleString()}
                   </div>
                   <div style={{ fontSize: '.75rem', color: '#94A3B8', marginBottom: '.625rem' }}>
-                    /night · ~${pkg.price_per_night_usd} USD
+                    /night · ~${pkg.price_usd} USD
                   </div>
                   {!soldOut && available <= 15 && (
                     <div style={{ fontSize: '.75rem', color: '#F59E0B', fontWeight: 700, marginBottom: '.5rem' }}>Only {available} left</div>

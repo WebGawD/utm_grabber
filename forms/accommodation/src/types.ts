@@ -11,8 +11,8 @@ export interface AccomPackage {
   id: string
   hotel_name: string
   description: string
-  price_per_night_zar: number
-  price_per_night_usd: number
+  price_zar: number
+  price_usd: number
   total_rooms: number
   booked_count: number
   amenities: string[] | string
