@@ -10,11 +10,13 @@ get_header();
 $sponsors = array();
 if ( defined( 'AWSISA_SUPABASE_URL' ) ) {
 	$response = awsisa_supabase_request(
-		'/rest/v1/sponsors?is_active=eq.true&select=id,name,tier,logo_url,website_url,description,booth_number,slug&order=tier.asc,name.asc',
-		array( 'method' => 'GET' )
+		'sponsors',
+		'GET',
+		array(),
+		'is_active=eq.true&select=id,name,tier,logo_url,website_url,description,booth_number,slug&order=tier.asc,name.asc'
 	);
 	if ( ! is_wp_error( $response ) ) {
-		$sponsors = json_decode( $response, true ) ?: array();
+		$sponsors = is_array( $response ) ? $response : array();
 	}
 }
 

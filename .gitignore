@@ -7,6 +7,8 @@ node_modules/
 
 # Environment files — never commit real credentials
 admin-pwa/.env
+admin-pwa/.env.local
+admin-pwa/.env.*.local
 # .env.example is safe to commit
 
 # OS / editor

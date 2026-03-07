@@ -89,10 +89,12 @@ while ( have_posts() ) :
 						$speaker_name    = get_the_title();
 						$encoded_name    = urlencode( $speaker_name );
 						$sessions_resp   = awsisa_supabase_request(
-							'/rest/v1/agenda_sessions?speakers=cs.%5B"' . $encoded_name . '"%5D&is_published=eq.true&order=session_date.asc,start_time.asc',
-							array( 'method' => 'GET' )
+							'agenda_sessions',
+							'GET',
+							array(),
+							'speakers=cs.%5B"' . $encoded_name . '"%5D&is_published=eq.true&order=session_date.asc,start_time.asc'
 						);
-						$speaker_sessions = ! is_wp_error( $sessions_resp ) ? ( json_decode( $sessions_resp, true ) ?: array() ) : array();
+						$speaker_sessions = ! is_wp_error( $sessions_resp ) ? ( is_array( $sessions_resp ) ? $sessions_resp : array() ) : array();
 
 						if ( ! empty( $speaker_sessions ) ) : ?>
 							<h3 style="font-size:1.1rem;font-weight:700;color:#0F172A;margin:2rem 0 1rem;">Sessions</h3>

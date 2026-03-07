@@ -55,11 +55,13 @@ wp_localize_script(
 			$packages = array();
 			if ( defined( 'AWSISA_SUPABASE_URL' ) ) {
 				$response = awsisa_supabase_request(
-					'/rest/v1/accommodation_packages?is_active=eq.true&order=price_per_night_zar.asc',
-					array( 'method' => 'GET' )
+					'accommodation_packages',
+					'GET',
+					array(),
+					'is_active=eq.true&order=price_per_night_zar.asc'
 				);
 				if ( ! is_wp_error( $response ) ) {
-					$packages = json_decode( $response, true ) ?: array();
+					$packages = is_array( $response ) ? $response : array();
 				}
 			}
 

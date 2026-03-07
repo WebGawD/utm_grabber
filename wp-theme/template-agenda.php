@@ -17,11 +17,13 @@ $days = array(
 $sessions = array();
 if ( defined( 'AWSISA_SUPABASE_URL' ) ) {
 	$response = awsisa_supabase_request(
-		'/rest/v1/agenda_sessions?is_published=eq.true&order=session_date.asc,start_time.asc',
-		array( 'method' => 'GET' )
+		'agenda_sessions',
+		'GET',
+		array(),
+		'is_published=eq.true&order=session_date.asc,start_time.asc'
 	);
 	if ( ! is_wp_error( $response ) ) {
-		$raw = json_decode( $response, true ) ?: array();
+		$raw = is_array( $response ) ? $response : array();
 		foreach ( $raw as $s ) {
 			$sessions[ $s['session_date'] ][] = $s;
 		}

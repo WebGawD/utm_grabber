@@ -37,11 +37,13 @@ get_header();
 		$items = array();
 		if ( defined( 'AWSISA_SUPABASE_URL' ) ) {
 			$response = awsisa_supabase_request(
-				'/rest/v1/swag_bag_items?is_active=eq.true&select=id,title,description,file_url,file_type,download_count,sponsor_id,sponsors(name,logo_url,tier)&order=created_at.desc',
-				array( 'method' => 'GET' )
+				'swag_bag_items',
+				'GET',
+				array(),
+				'is_active=eq.true&select=id,title,description,file_url,file_type,download_count,sponsor_id,sponsors(name,logo_url,tier)&order=created_at.desc'
 			);
 			if ( ! is_wp_error( $response ) ) {
-				$items = json_decode( $response, true ) ?: array();
+				$items = is_array( $response ) ? $response : array();
 			}
 		}
 
