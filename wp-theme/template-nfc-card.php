@@ -432,7 +432,7 @@ $page_title = $delegate
 		<div class="nfc-card__footer">
 			<div class="nfc-card__event-name">
 				Watersan Dialogue 2026<br>
-				Emperors Palace · Johannesburg
+				ICC Durban
 			</div>
 			<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="nfc-card__event-logo" aria-label="AWSISA homepage">
 				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" aria-hidden="true"><path d="M12 2C8 2 4 8 4 14s4 8 8 8 8-2 8-8S16 2 12 2z"/><path d="M12 8v8M8 12h8"/></svg>

@@ -24,7 +24,7 @@ get_header();
 					<path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
 					<path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
 				</svg>
-				<?php esc_html_e( 'Emperors Palace, Johannesburg · 9–12 November 2026', 'awsisa' ); ?>
+				<?php esc_html_e( 'ICC Durban · 9–12 November 2026', 'awsisa' ); ?>
 			</span>
 
 			<h1 class="hero__title" id="hero-title">
@@ -149,18 +149,18 @@ get_header();
 				<!-- Map / Venue visual -->
 				<div style="border-radius: 1rem; overflow: hidden; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.2);">
 					<iframe
-						src="https://maps.google.com/maps?q=Emperors+Palace+Hotel+Johannesburg&t=&z=15&ie=UTF8&iwloc=&output=embed"
+						src="https://maps.google.com/maps?q=ICC+Durban+45+Bram+Fischer+Road+Durban&t=&z=15&ie=UTF8&iwloc=&output=embed"
 						width="100%"
 						height="380"
 						style="border: 0; display: block;"
 						allowfullscreen=""
 						loading="lazy"
 						referrerpolicy="no-referrer-when-downgrade"
-						title="<?php esc_attr_e( 'Emperors Palace, Johannesburg — Event Venue', 'awsisa' ); ?>"
+						title="<?php esc_attr_e( 'ICC Durban — Event Venue', 'awsisa' ); ?>"
 					></iframe>
 				</div>
 				<p style="text-align: center; font-size: 0.875rem; color: #64748B; margin-top: 0.75rem;">
-					<?php esc_html_e( 'Emperors Palace Hotel, 64 Jones Road, Kempton Park, Johannesburg', 'awsisa' ); ?>
+					<?php esc_html_e( 'Inkosi Albert Luthuli ICC, 45 Bram Fischer Road, Durban', 'awsisa' ); ?>
 				</p>
 			</div>
 		</div>

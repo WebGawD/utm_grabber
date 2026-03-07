@@ -34,7 +34,7 @@ wp_localize_script(
 	<div class="container">
 		<p class="page-hero__eyebrow">Watersan Dialogue 2026</p>
 		<h1 class="page-hero__title">Conference Accommodation</h1>
-		<p class="page-hero__subtitle">Exclusive rates at Emperors Palace &amp; partner hotels for registered delegates.</p>
+		<p class="page-hero__subtitle">Exclusive rates at ICC Durban partner hotels for registered delegates.</p>
 	</div>
 </section>
 
@@ -47,7 +47,7 @@ wp_localize_script(
 
 			<div class="section__header">
 				<h2 class="section__title">Choose Your Package</h2>
-				<p class="section__subtitle">All rates are per room per night and include breakfast. Conference shuttle runs every 30 minutes between Birchwood and Emperors Palace.</p>
+				<p class="section__subtitle">All rates are per room per night and include breakfast.</p>
 			</div>
 
 			<?php

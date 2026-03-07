@@ -337,7 +337,7 @@ function awsisa_event_dates() {
  * @return string
  */
 function awsisa_venue() {
-	return esc_html__( 'Emperors Palace, Johannesburg, South Africa', 'awsisa' );
+	return esc_html__( 'ICC Durban, KwaZulu-Natal, South Africa', 'awsisa' );
 }
 
 /**

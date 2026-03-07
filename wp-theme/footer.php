@@ -86,9 +86,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</p>
 				<p class="footer__contact">
 					<strong style="color: rgba(255,255,255,0.9);"><?php esc_html_e( 'Venue', 'awsisa' ); ?></strong><br>
-					Emperors Palace Hotel<br>
-					64 Jones Road, Kempton Park<br>
-					Johannesburg, South Africa
+					Inkosi Albert Luthuli ICC<br>
+					45 Bram Fischer Road, Durban<br>
+					KwaZulu-Natal, South Africa
 				</p>
 				<p class="footer__contact" style="margin-top: 1rem;">
 					<strong style="color: rgba(255,255,255,0.9);"><?php esc_html_e( 'Event Dates', 'awsisa' ); ?></strong><br>

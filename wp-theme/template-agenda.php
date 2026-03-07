@@ -36,7 +36,7 @@ if ( defined( 'AWSISA_SUPABASE_URL' ) ) {
 	<div class="container">
 		<p class="page-hero__eyebrow">Watersan Dialogue 2026</p>
 		<h1 class="page-hero__title">Conference Programme</h1>
-		<p class="page-hero__subtitle">9 – 12 November 2026 · Emperors Palace, Johannesburg</p>
+		<p class="page-hero__subtitle">9 – 12 November 2026 · ICC Durban</p>
 	</div>
 </section>
 

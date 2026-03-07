@@ -138,9 +138,9 @@ get_header();
 
 				<div style="margin-top:2rem;padding:1.25rem;background:#F0FDFA;border:1px solid #99F6E4;border-radius:12px;">
 					<h3 style="font-size:1rem;font-weight:700;color:#0F172A;margin:0 0 .75rem;">📍 Venue</h3>
-					<p style="font-size:.875rem;color:#475569;margin:0 0 .5rem;"><strong>Emperors Palace Hotel Casino Convention Resort</strong></p>
-					<p style="font-size:.875rem;color:#475569;margin:0 0 .5rem;">64 Jones Road, Kempton Park, 1620<br>Gauteng, South Africa</p>
-					<a href="https://maps.google.com/?q=Emperors+Palace+Kempton+Park" target="_blank" rel="noopener" style="font-size:.8rem;color:#0D9488;">Open in Google Maps →</a>
+					<p style="font-size:.875rem;color:#475569;margin:0 0 .5rem;"><strong>Inkosi Albert Luthuli International Convention Centre (ICC)</strong></p>
+					<p style="font-size:.875rem;color:#475569;margin:0 0 .5rem;">45 Bram Fischer Road, Durban, 4001<br>KwaZulu-Natal, South Africa</p>
+					<a href="https://maps.google.com/?q=ICC+Durban+45+Bram+Fischer+Road" target="_blank" rel="noopener" style="font-size:.8rem;color:#0D9488;">Open in Google Maps →</a>
 				</div>
 
 				<div style="margin-top:1.25rem;padding:1.25rem;background:#FFF7ED;border:1px solid #FED7AA;border-radius:12px;">
