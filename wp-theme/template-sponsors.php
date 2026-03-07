@@ -13,7 +13,7 @@ if ( defined( 'AWSISA_SUPABASE_URL' ) ) {
 		'sponsors',
 		'GET',
 		array(),
-		'is_active=eq.true&select=id,name,tier,logo_url,website_url,description,booth_number,slug&order=tier.asc,name.asc'
+		'is_active=eq.true&select=id,name,tier,logo_url,website_url,description,booth_number,booth_nfc_slug&order=tier.asc,name.asc'
 	);
 	if ( ! is_wp_error( $response ) ) {
 		$sponsors = is_array( $response ) ? $response : array();
@@ -66,8 +66,8 @@ foreach ( $sponsors as $s ) {
 					</h2>
 					<div style="display:flex;flex-wrap:wrap;gap:1.5rem;align-items:center;">
 						<?php foreach ( $tier_sponsors as $sponsor ) : ?>
-							<a href="<?php echo esc_url( ! empty( $sponsor['slug'] ) ? home_url( '/booth/' . $sponsor['slug'] . '/' ) : $sponsor['website_url'] ); ?>"
-								<?php echo empty( $sponsor['slug'] ) ? 'target="_blank" rel="noopener"' : ''; ?>
+							<a href="<?php echo esc_url( ! empty( $sponsor['booth_nfc_slug'] ) ? home_url( '/booth/' . $sponsor['booth_nfc_slug'] . '/' ) : $sponsor['website_url'] ); ?>"
+								<?php echo empty( $sponsor['booth_nfc_slug'] ) ? 'target="_blank" rel="noopener"' : ''; ?>
 								style="display:flex;align-items:center;justify-content:center;background:<?php echo esc_attr( $tier['bg'] ); ?>;border:1px solid <?php echo esc_attr( $tier['border'] ); ?>;border-radius:12px;padding:1.25rem;transition:transform .15s,box-shadow .15s;width:<?php echo esc_attr( $tier['size'] ); ?>;min-height:80px;">
 								<?php if ( ! empty( $sponsor['logo_url'] ) ) : ?>
 									<img src="<?php echo esc_url( $sponsor['logo_url'] ); ?>"

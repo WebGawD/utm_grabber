@@ -58,7 +58,7 @@ wp_localize_script(
 					'accommodation_packages',
 					'GET',
 					array(),
-					'is_active=eq.true&order=price_per_night_zar.asc'
+					'is_active=eq.true&order=price_zar.asc'
 				);
 				if ( ! is_wp_error( $response ) ) {
 					$packages = is_array( $response ) ? $response : array();
@@ -72,8 +72,8 @@ wp_localize_script(
 						'id'                  => '',
 						'hotel_name'          => 'Emperors Palace — Standard Room',
 						'description'         => 'Elegant standard room with garden view, conference Wi-Fi, and daily breakfast.',
-						'price_per_night_zar' => 2400,
-						'price_per_night_usd' => 130,
+						'price_zar' => 2400,
+						'price_usd' => 130,
 						'total_rooms'         => 150,
 						'booked_count'        => 0,
 						'amenities'           => array( 'Breakfast', 'Wi-Fi', 'Parking', 'Pool access' ),
@@ -83,8 +83,8 @@ wp_localize_script(
 						'id'                  => '',
 						'hotel_name'          => 'Emperors Palace — Deluxe Room',
 						'description'         => 'Spacious deluxe room with casino resort views, lounge access, and premium amenities.',
-						'price_per_night_zar' => 3200,
-						'price_per_night_usd' => 175,
+						'price_zar' => 3200,
+						'price_usd' => 175,
 						'total_rooms'         => 80,
 						'booked_count'        => 0,
 						'amenities'           => array( 'Breakfast', 'Wi-Fi', 'Lounge access', 'Parking', 'Spa discount' ),
@@ -94,8 +94,8 @@ wp_localize_script(
 						'id'                  => '',
 						'hotel_name'          => 'Birchwood Hotel — Standard Room',
 						'description'         => 'Comfortable budget option 15 min from venue. Shuttle included.',
-						'price_per_night_zar' => 1400,
-						'price_per_night_usd' => 76,
+						'price_zar' => 1400,
+						'price_usd' => 76,
 						'total_rooms'         => 120,
 						'booked_count'        => 0,
 						'amenities'           => array( 'Breakfast', 'Wi-Fi', 'Conference shuttle', 'Parking' ),
@@ -131,11 +131,11 @@ wp_localize_script(
 
 						<div style="display:flex;align-items:flex-end;justify-content:space-between;border-top:1px solid #F1F5F9;padding-top:1rem;">
 							<div>
-								<div style="font-size:1.5rem;font-weight:800;color:#0D9488;">R <?php echo esc_html( number_format( $pkg['price_per_night_zar'] ) ); ?></div>
-								<div style="font-size:.8rem;color:#94A3B8;">per night &nbsp;·&nbsp; ~$<?php echo esc_html( $pkg['price_per_night_usd'] ); ?> USD</div>
+								<div style="font-size:1.5rem;font-weight:800;color:#0D9488;">R <?php echo esc_html( number_format( $pkg['price_zar'] ) ); ?></div>
+								<div style="font-size:.8rem;color:#94A3B8;">per night &nbsp;·&nbsp; ~$<?php echo esc_html( $pkg['price_usd'] ); ?> USD</div>
 							</div>
 							<?php if ( ! $sold_out && ! empty( $pkg['id'] ) ) : ?>
-								<button class="btn btn--primary js-book-room" data-package-id="<?php echo esc_attr( $pkg['id'] ); ?>" data-hotel="<?php echo esc_attr( $pkg['hotel_name'] ); ?>" data-price="<?php echo esc_attr( $pkg['price_per_night_zar'] ); ?>">Book Now</button>
+								<button class="btn btn--primary js-book-room" data-package-id="<?php echo esc_attr( $pkg['id'] ); ?>" data-hotel="<?php echo esc_attr( $pkg['hotel_name'] ); ?>" data-price="<?php echo esc_attr( $pkg['price_zar'] ); ?>">Book Now</button>
 							<?php elseif ( $sold_out ) : ?>
 								<button class="btn btn--outline" disabled>Unavailable</button>
 							<?php else : ?>

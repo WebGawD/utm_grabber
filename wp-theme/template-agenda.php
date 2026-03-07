@@ -20,12 +20,12 @@ if ( defined( 'AWSISA_SUPABASE_URL' ) ) {
 		'agenda_sessions',
 		'GET',
 		array(),
-		'is_published=eq.true&order=session_date.asc,start_time.asc'
+		'is_published=eq.true&order=day.asc,start_time.asc'
 	);
 	if ( ! is_wp_error( $response ) ) {
 		$raw = is_array( $response ) ? $response : array();
 		foreach ( $raw as $s ) {
-			$sessions[ $s['session_date'] ][] = $s;
+			$sessions[ $s['day'] ][] = $s;
 		}
 	}
 }
@@ -106,11 +106,14 @@ if ( defined( 'AWSISA_SUPABASE_URL' ) ) {
 										<?php endif; ?>
 									</div>
 									<h3 style="font-size:1rem;font-weight:700;color:#0F172A;margin:0 0 .25rem;"><?php echo esc_html( $s['title'] ); ?></h3>
-									<?php if ( ! empty( $s['speakers'] ) ) : ?>
+									<?php if ( ! empty( $s['speaker_name'] ) ) : ?>
 										<p style="font-size:.8rem;color:#475569;margin:0 0 .25rem;">
 											<?php
-											$speaker_list = is_array( $s['speakers'] ) ? $s['speakers'] : array( $s['speakers'] );
-											echo esc_html( implode( ', ', $speaker_list ) );
+											$spk = esc_html( $s['speaker_name'] );
+											if ( ! empty( $s['speaker_org'] ) ) {
+												$spk .= ' · ' . esc_html( $s['speaker_org'] );
+											}
+											echo $spk;
 											?>
 										</p>
 									<?php endif; ?>
