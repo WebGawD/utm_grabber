@@ -75,7 +75,7 @@ export default function LoginPage() {
         body:    JSON.stringify({ email }),
       })
       const j = await res.json()
-      if (!res.ok || !j.sent) throw new Error(j.message || 'Could not send code. Are you registered?')
+      if (!res.ok) throw new Error(j.message || 'Could not send code. Are you registered?')
       setStage('otp')
       setTimeout(() => otpRef.current?.focus(), 100)
     } catch (e) {
