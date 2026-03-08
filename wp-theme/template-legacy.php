@@ -148,7 +148,7 @@ get_header();
 			<!-- Progress bar -->
 			<div style="margin-bottom:.625rem;display:flex;justify-content:space-between;font-size:.875rem;font-weight:600;">
 				<span style="color:#15803D;"><?php esc_html_e( 'R 0 raised', 'awsisa' ); ?></span>
-				<span style="color:#14532D;"><?php esc_html_e( 'Goal: R 500,000', 'awsisa' ); ?></span>
+				<span style="color:#14532D;"><?php esc_html_e( 'Goal: R 85,000', 'awsisa' ); ?></span>
 			</div>
 			<div style="background:#BBF7D0;border-radius:99px;height:12px;overflow:hidden;margin-bottom:1.5rem;">
 				<div style="height:100%;width:0%;background:linear-gradient(90deg,#16A34A,#15803D);border-radius:99px;transition:width .6s ease;"></div>

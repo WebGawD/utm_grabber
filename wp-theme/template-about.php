@@ -152,18 +152,34 @@ get_header();
 		<div style="text-align:center;margin-bottom:2.5rem;">
 			<h2 style="color:#0F172A;margin:0 0 .5rem;"><?php esc_html_e( 'Organising Committee', 'awsisa' ); ?></h2>
 			<p style="color:#64748B;max-width:480px;margin:0 auto;">
-				<?php esc_html_e( 'Details of the 2026 organising committee will be published here shortly.', 'awsisa' ); ?>
+				<?php esc_html_e( 'The dedicated team bringing the Watersan Dialogue 2026 to life.', 'awsisa' ); ?>
 			</p>
 		</div>
 
 		<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1.25rem;">
-			<?php for ( $i = 0; $i < 6; $i++ ) : ?>
-				<div class="card" style="padding:1.5rem;text-align:center;opacity:.45;">
-					<div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#CBD5E1,#E2E8F0);margin:0 auto 1rem;"></div>
-					<div style="height:.875rem;background:#E2E8F0;border-radius:4px;width:70%;margin:0 auto .5rem;"></div>
-					<div style="height:.75rem;background:#F1F5F9;border-radius:4px;width:55%;margin:0 auto;"></div>
+
+			<?php
+			$committee = array(
+				array( 'name' => 'Mawande Ndlebe',    'org' => 'Free State Water' ),
+				array( 'name' => 'Ben Ngobeni',        'org' => 'Magalies Water' ),
+				array( 'name' => 'Ramateu Mofokeng',   'org' => 'AWSISA' ),
+				array( 'name' => 'Slindile Sono',      'org' => 'ICT Risima' ),
+				array( 'name' => 'Aphiwe Mcunu',       'org' => 'Department of Health' ),
+				array( 'name' => 'Pemmy Majodina',     'org' => 'Minister of Water and Sanitation' ),
+			);
+			foreach ( $committee as $m ) :
+				$words    = explode( ' ', $m['name'] );
+				$initials = strtoupper( $words[0][0] . end( $words )[0] );
+			?>
+				<div class="card" style="padding:1.5rem;text-align:center;">
+					<div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#0D9488,#134E4A);margin:0 auto 1rem;display:flex;align-items:center;justify-content:center;">
+						<span style="color:#fff;font-weight:800;font-size:1.1rem;font-family:'Outfit',sans-serif;"><?php echo esc_html( $initials ); ?></span>
+					</div>
+					<p style="font-weight:700;color:#0F172A;margin:0 0 .25rem;font-size:.9375rem;"><?php echo esc_html( $m['name'] ); ?></p>
+					<p style="font-size:.8125rem;color:#0D9488;margin:0;"><?php echo esc_html( $m['org'] ); ?></p>
 				</div>
-			<?php endfor; ?>
+			<?php endforeach; ?>
+
 		</div>
 
 	</div>
