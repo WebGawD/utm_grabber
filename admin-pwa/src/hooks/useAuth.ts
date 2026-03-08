@@ -27,9 +27,14 @@ export function useAuth(): AuthState & {
 
   useEffect(() => {
     // Initialise session on mount.
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      await resolveSession(session)
-    })
+    supabase.auth.getSession()
+      .then(async ({ data: { session } }) => {
+        await resolveSession(session)
+      })
+      .catch(() => {
+        // getSession failed (e.g. expired refresh token) — treat as logged out.
+        setState({ user: null, session: null, staffUser: null, loading: false, isAdmin: false, isStaff: false })
+      })
 
     // Listen for auth changes.
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -47,20 +52,25 @@ export function useAuth(): AuthState & {
       return
     }
 
-    const { data: staffUser } = await supabase
-      .from('staff_users')
-      .select('*')
-      .eq('id', session.user.id)
-      .single()
+    try {
+      const { data: staffUser } = await supabase
+        .from('staff_users')
+        .select('*')
+        .eq('id', session.user.id)
+        .single()
 
-    setState({
-      user:      session.user,
-      session,
-      staffUser: staffUser ?? null,
-      loading:   false,
-      isAdmin:   ['admin', 'super_admin'].includes(staffUser?.role ?? ''),
-      isStaff:   ['staff', 'admin', 'super_admin', 'volunteer'].includes(staffUser?.role ?? ''),
-    })
+      setState({
+        user:      session.user,
+        session,
+        staffUser: staffUser ?? null,
+        loading:   false,
+        isAdmin:   ['admin', 'super_admin'].includes(staffUser?.role ?? ''),
+        isStaff:   ['staff', 'admin', 'super_admin', 'volunteer'].includes(staffUser?.role ?? ''),
+      })
+    } catch {
+      // staff_users query failed — clear session and stop loading.
+      setState({ user: null, session: null, staffUser: null, loading: false, isAdmin: false, isStaff: false })
+    }
   }
 
   async function signIn(email: string, password: string) {
