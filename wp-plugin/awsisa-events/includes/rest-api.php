@@ -188,9 +188,18 @@ function awsisa_rest_register( WP_REST_Request $request ) {
 function awsisa_rest_donate( WP_REST_Request $request ) {
 	$body = $request->get_json_params() ?: $request->get_body_params();
 
-	$donor_name   = isset( $body['donor_name'] )  ? sanitize_text_field( $body['donor_name'] ) : '';
-	$donor_email  = isset( $body['donor_email'] ) ? sanitize_email( $body['donor_email'] )     : '';
-	$amount_zar   = isset( $body['amount_zar'] )  ? abs( floatval( $body['amount_zar'] ) )     : 0;
+	// Accept either donor_name (legacy) or first_name + last_name (React app).
+	if ( ! empty( $body['donor_name'] ) ) {
+		$donor_name = sanitize_text_field( $body['donor_name'] );
+	} else {
+		$donor_name = trim(
+			sanitize_text_field( $body['first_name'] ?? '' ) . ' ' .
+			sanitize_text_field( $body['last_name'] ?? '' )
+		);
+	}
+	// Accept either donor_email (legacy) or email (React app).
+	$donor_email   = sanitize_email( $body['donor_email'] ?? $body['email'] ?? '' );
+	$amount_zar    = isset( $body['amount_zar'] )  ? abs( floatval( $body['amount_zar'] ) ) : 0;
 	$popia_consent = ! empty( $body['popia_consent'] );
 
 	if ( empty( $donor_name ) || ! is_email( $donor_email ) ) {
@@ -257,11 +266,13 @@ function awsisa_rest_book_accomm( WP_REST_Request $request ) {
 	$delegate_email  = isset( $body['delegate_email'] ) ? sanitize_email( $body['delegate_email'] )     : '';
 	$package_id      = isset( $body['package_id'] )     ? sanitize_text_field( $body['package_id'] )   : '';
 
-	// If delegate_id not provided, resolve it from email.
+	// If delegate_id not provided, resolve it from email (also fetch name/email for confirmation email).
+	$delegate_data = array();
 	if ( empty( $delegate_id ) && ! empty( $delegate_email ) ) {
-		$delegate_row = awsisa_supabase( 'delegates', 'GET', array(), 'email=eq.' . rawurlencode( $delegate_email ) . '&select=id&limit=1' );
+		$delegate_row = awsisa_supabase( 'delegates', 'GET', array(), 'email=eq.' . rawurlencode( $delegate_email ) . '&select=id,first_name,last_name,email&limit=1' );
 		if ( ! is_wp_error( $delegate_row ) && ! empty( $delegate_row[0]['id'] ) ) {
-			$delegate_id = $delegate_row[0]['id'];
+			$delegate_id   = $delegate_row[0]['id'];
+			$delegate_data = $delegate_row[0];
 		}
 	}
 
@@ -305,6 +316,18 @@ function awsisa_rest_book_accomm( WP_REST_Request $request ) {
 	), 'id=eq.' . rawurlencode( $package_id ), true );
 
 	$booking_row = is_array( $booking ) && isset( $booking[0] ) ? $booking[0] : $booking;
+
+	// Send booking confirmation email to delegate.
+	if ( empty( $delegate_data ) ) {
+		// Fetch delegate name/email if we only have the ID (delegate_id was supplied directly).
+		$drec = awsisa_supabase( 'delegates', 'GET', array(), 'id=eq.' . rawurlencode( $delegate_id ) . '&select=first_name,last_name,email&limit=1' );
+		if ( ! is_wp_error( $drec ) && ! empty( $drec[0] ) ) {
+			$delegate_data = $drec[0];
+		}
+	}
+	if ( ! empty( $delegate_data ) ) {
+		awsisa_send_accomm_booking_email( $delegate_data, $pkg, $booking_row, $body );
+	}
 
 	return new WP_REST_Response( array(
 		'success'    => true,
