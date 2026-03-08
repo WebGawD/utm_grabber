@@ -117,7 +117,17 @@ export default function Step3Accommodation({ form, update, onNext, onBack }: Pro
                 const available = pkg.total_rooms - pkg.booked_count
                 const soldOut   = available <= 0
                 const selected  = form.accommodation_package_id === pkg.id
-                const amenities = Array.isArray(pkg.amenities) ? pkg.amenities : JSON.parse(pkg.amenities || '[]')
+                let amenities: string[] = []
+                try {
+                  amenities = Array.isArray(pkg.amenities)
+                    ? pkg.amenities
+                    : JSON.parse(pkg.amenities || '[]')
+                } catch {
+                  // Supabase may return PostgreSQL text[] as "{item1,item2}" — parse it manually
+                  amenities = typeof (pkg.amenities as unknown) === 'string'
+                    ? (pkg.amenities as unknown as string).replace(/^\{|\}$/g, '').split(',').map((s: string) => s.trim()).filter(Boolean)
+                    : []
+                }
                 const pkgNights = pkg.nights || nights
 
                 return (
@@ -150,8 +160,8 @@ export default function Step3Accommodation({ form, update, onNext, onBack }: Pro
                       </div>
                       <div style={{ textAlign: 'right', flexShrink: 0 }}>
                         <div style={{ fontSize: '.75rem', color: '#94A3B8' }}>{pkgNights} nights</div>
-                        <div style={{ fontWeight: 800, fontSize: '1.25rem', color: '#0D9488' }}>R {pkg.price_zar.toLocaleString()}</div>
-                        {pkg.price_usd > 0 && <div style={{ fontSize: '.7rem', color: '#94A3B8' }}>~${pkg.price_usd.toLocaleString()} USD</div>}
+                        <div style={{ fontWeight: 800, fontSize: '1.25rem', color: '#0D9488' }}>R {(pkg.price_zar ?? 0).toLocaleString()}</div>
+                        {(pkg.price_usd ?? 0) > 0 && <div style={{ fontSize: '.7rem', color: '#94A3B8' }}>~${pkg.price_usd.toLocaleString()} USD</div>}
                         {!soldOut && available <= 15 && (
                           <div style={{ fontSize: '.7rem', color: '#F59E0B', fontWeight: 700, marginTop: '.25rem' }}>Only {available} left</div>
                         )}
