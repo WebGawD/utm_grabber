@@ -96,7 +96,7 @@ export default function LoginPage() {
       const res = await fetch(`${REST}/delegate/auth/verify-otp`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ email, otp }),
+        body:    JSON.stringify({ email, code: otp }),
       })
       const j = await res.json()
       if (!res.ok || !j.delegate) throw new Error(j.message || 'Invalid or expired code.')
