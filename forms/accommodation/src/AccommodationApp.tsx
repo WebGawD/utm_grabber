@@ -69,12 +69,12 @@ export default function AccommodationApp() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': cfg.nonce },
         body: JSON.stringify({
-          package_id:      selected.id,
-          delegate_email:  form.delegate_email,
-          check_in_date:   form.check_in_date,
-          check_out_date:  form.check_out_date,
-          notes:           form.notes || null,
-          popia_consent:   form.popia_consent,
+          package_id:       selected.id,
+          delegate_email:   form.delegate_email,
+          check_in_date:    form.check_in_date,
+          check_out_date:   form.check_out_date,
+          special_requests: form.notes || null,
+          popia_consent:    form.popia_consent,
         }),
       })
 
@@ -119,9 +119,16 @@ export default function AccommodationApp() {
   if (stage === 'details' && selected) {
     const totalZar = selected.price_zar * nights
     const totalUsd = selected.price_usd * nights
-    const amenities: string[] = Array.isArray(selected.amenities)
-      ? selected.amenities
-      : JSON.parse(selected.amenities || '[]')
+    let amenities: string[] = []
+    try {
+      amenities = Array.isArray(selected.amenities)
+        ? selected.amenities
+        : JSON.parse((selected.amenities as unknown as string) || '[]')
+    } catch {
+      amenities = typeof selected.amenities === 'string'
+        ? (selected.amenities as unknown as string).replace(/^\{|\}$/g, '').split(',').map(s => s.trim()).filter(Boolean)
+        : []
+    }
 
     return (
       <div style={{ maxWidth: 560, margin: '0 auto' }}>
@@ -252,9 +259,16 @@ export default function AccommodationApp() {
           {packages.map(pkg => {
             const available = pkg.total_rooms - pkg.booked_count
             const soldOut   = available <= 0
-            const amenities: string[] = Array.isArray(pkg.amenities)
-              ? pkg.amenities
-              : JSON.parse(pkg.amenities || '[]')
+            let amenities: string[] = []
+            try {
+              amenities = Array.isArray(pkg.amenities)
+                ? pkg.amenities
+                : JSON.parse((pkg.amenities as unknown as string) || '[]')
+            } catch {
+              amenities = typeof pkg.amenities === 'string'
+                ? (pkg.amenities as unknown as string).replace(/^\{|\}$/g, '').split(',').map(s => s.trim()).filter(Boolean)
+                : []
+            }
 
             return (
               <div

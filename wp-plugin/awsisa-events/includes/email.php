@@ -35,7 +35,7 @@ function awsisa_send_registration_email( $delegate ) {
 	$qr_token   = $delegate['qr_code_token'] ?? '';
 	$qr_url     = 'https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=' . rawurlencode( $qr_token );
 	$event_date = '9 – 12 November 2026';
-	$venue      = 'Emperors Palace, Johannesburg';
+	$venue      = 'Inkosi Albert Luthuli ICC, 45 Bram Fischer Road, Durban';
 
 	$message = awsisa_email_registration_html( array(
 		'name'       => $name,

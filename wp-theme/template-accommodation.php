@@ -66,40 +66,40 @@ wp_localize_script(
 			}
 
 			if ( empty( $packages ) ) :
-				// Hardcoded fallback.
+				// Hardcoded fallback (ICC Durban partner hotels).
 				$packages = array(
 					array(
-						'id'                  => '',
-						'hotel_name'          => 'Emperors Palace — Standard Room',
-						'description'         => 'Elegant standard room with garden view, conference Wi-Fi, and daily breakfast.',
-						'price_zar' => 2400,
-						'price_usd' => 130,
-						'total_rooms'         => 150,
-						'booked_count'        => 0,
-						'amenities'           => array( 'Breakfast', 'Wi-Fi', 'Parking', 'Pool access' ),
-						'tier'                => 'standard',
+						'id'           => '',
+						'hotel_name'   => 'Garden Court Marine Parade',
+						'description'  => 'Budget-friendly beachfront hotel, 10-minute walk to the ICC Durban.',
+						'price_zar'    => 2200,
+						'price_usd'    => 122,
+						'total_rooms'  => 50,
+						'booked_count' => 0,
+						'amenities'    => array( 'Breakfast included', 'Free WiFi', 'Beachfront', '10 min walk to ICC' ),
+						'tier'         => 'standard',
 					),
 					array(
-						'id'                  => '',
-						'hotel_name'          => 'Emperors Palace — Deluxe Room',
-						'description'         => 'Spacious deluxe room with casino resort views, lounge access, and premium amenities.',
-						'price_zar' => 3200,
-						'price_usd' => 175,
-						'total_rooms'         => 80,
-						'booked_count'        => 0,
-						'amenities'           => array( 'Breakfast', 'Wi-Fi', 'Lounge access', 'Parking', 'Spa discount' ),
-						'tier'                => 'deluxe',
+						'id'           => '',
+						'hotel_name'   => 'Elangeni & Maharani Hotel',
+						'description'  => 'Popular conference hotel directly adjacent to the ICC Durban.',
+						'price_zar'    => 3500,
+						'price_usd'    => 194,
+						'total_rooms'  => 60,
+						'booked_count' => 0,
+						'amenities'    => array( 'Breakfast included', 'Free WiFi', 'Pool', 'Adjacent to ICC' ),
+						'tier'         => 'deluxe',
 					),
 					array(
-						'id'                  => '',
-						'hotel_name'          => 'Birchwood Hotel — Standard Room',
-						'description'         => 'Comfortable budget option 15 min from venue. Shuttle included.',
-						'price_zar' => 1400,
-						'price_usd' => 76,
-						'total_rooms'         => 120,
-						'booked_count'        => 0,
-						'amenities'           => array( 'Breakfast', 'Wi-Fi', 'Conference shuttle', 'Parking' ),
-						'tier'                => 'standard',
+						'id'           => '',
+						'hotel_name'   => 'Hilton Durban',
+						'description'  => 'Premium hotel directly opposite the ICC Durban, 2-minute walk.',
+						'price_zar'    => 5200,
+						'price_usd'    => 289,
+						'total_rooms'  => 40,
+						'booked_count' => 0,
+						'amenities'    => array( 'Breakfast included', 'Free WiFi', 'Gym access', 'Opposite ICC' ),
+						'tier'         => 'premium',
 					),
 				);
 			endif;
@@ -180,8 +180,8 @@ wp_localize_script(
 					<li>Bookings require a confirmed delegate registration</li>
 					<li>Payment is settled directly with the hotel at check-in</li>
 					<li>Cancellations accepted up to <strong>31 October 2026</strong></li>
-					<li>Conference shuttle departs every 30 min from Birchwood from 07:00–20:00</li>
-					<li>Contact <a href="mailto:accommodation@afriwater-san.africa" style="color:#0D9488;">accommodation@afriwater-san.africa</a> for group bookings (10+ rooms)</li>
+					<li>All partner hotels are within walking distance or a short taxi ride from the ICC Durban</li>
+					<li>Contact <a href="mailto:info@lubabalo.co.za" style="color:#0D9488;">info@lubabalo.co.za</a> for group bookings (10+ rooms)</li>
 				</ul>
 			</div>
 

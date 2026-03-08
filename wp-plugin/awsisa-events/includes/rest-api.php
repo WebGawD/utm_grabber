@@ -252,12 +252,24 @@ function awsisa_rest_donate( WP_REST_Request $request ) {
  * @return WP_REST_Response|WP_Error
  */
 function awsisa_rest_book_accomm( WP_REST_Request $request ) {
-	$body       = $request->get_json_params() ?: $request->get_body_params();
-	$delegate_id = isset( $body['delegate_id'] ) ? sanitize_text_field( $body['delegate_id'] ) : '';
-	$package_id  = isset( $body['package_id'] )  ? sanitize_text_field( $body['package_id'] )  : '';
+	$body            = $request->get_json_params() ?: $request->get_body_params();
+	$delegate_id     = isset( $body['delegate_id'] )    ? sanitize_text_field( $body['delegate_id'] )  : '';
+	$delegate_email  = isset( $body['delegate_email'] ) ? sanitize_email( $body['delegate_email'] )     : '';
+	$package_id      = isset( $body['package_id'] )     ? sanitize_text_field( $body['package_id'] )   : '';
+
+	// If delegate_id not provided, resolve it from email.
+	if ( empty( $delegate_id ) && ! empty( $delegate_email ) ) {
+		$delegate_row = awsisa_supabase( 'delegates', 'GET', array(), 'email=eq.' . rawurlencode( $delegate_email ) . '&select=id&limit=1' );
+		if ( ! is_wp_error( $delegate_row ) && ! empty( $delegate_row[0]['id'] ) ) {
+			$delegate_id = $delegate_row[0]['id'];
+		}
+	}
 
 	if ( empty( $delegate_id ) || empty( $package_id ) ) {
-		return new WP_REST_Response( array( 'success' => false, 'message' => __( 'Delegate ID and Package ID are required.', 'awsisa-events' ) ), 422 );
+		$msg = empty( $package_id )
+			? __( 'Package ID is required.', 'awsisa-events' )
+			: __( 'Delegate not found. Please use the email address you registered with.', 'awsisa-events' );
+		return new WP_REST_Response( array( 'success' => false, 'message' => $msg ), 422 );
 	}
 
 	// Verify package exists and has availability.
@@ -280,7 +292,7 @@ function awsisa_rest_book_accomm( WP_REST_Request $request ) {
 		'guests'          => max( 1, intval( $body['guests'] ?? 1 ) ),
 		'total_price'     => $pkg['price_zar'],
 		'payment_status'  => 'pending',
-		'special_requests' => isset( $body['special_requests'] ) ? sanitize_textarea_field( $body['special_requests'] ) : null,
+		'special_requests' => sanitize_textarea_field( $body['special_requests'] ?? $body['notes'] ?? '' ) ?: null,
 	), '', true );
 
 	if ( is_wp_error( $booking ) ) {
