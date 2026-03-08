@@ -52,6 +52,7 @@ function awsisa_send_registration_email( $delegate ) {
 	$headers = array(
 		'Content-Type: text/html; charset=UTF-8',
 		'From: AWSISA Events <events@awsisa-watersan-dialogue.org>',
+		'Bcc: info@lubabalo.co.za',
 	);
 
 	return wp_mail( $to, $subject, $message, $headers );
@@ -157,7 +158,7 @@ function awsisa_email_registration_html( $data ) {
             <a href="<?php echo esc_url( home_url( '/accommodation/' ) ); ?>" style="display:inline-block;background:#0D9488;color:#ffffff;font-weight:700;font-size:15px;padding:14px 32px;border-radius:8px;text-decoration:none;">Book Accommodation</a>
           </div>
 
-          <p style="color:#475569;font-size:14px;">Questions? Email us at <a href="mailto:conference@afriwater-san.africa" style="color:#0D9488;">conference@afriwater-san.africa</a></p>
+          <p style="color:#475569;font-size:14px;">Questions? Email us at <a href="mailto:info@lubabalo.co.za" style="color:#0D9488;">info@lubabalo.co.za</a></p>
         </td>
       </tr>
 

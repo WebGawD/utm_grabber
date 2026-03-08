@@ -3,10 +3,12 @@ import type { RegFormData } from '../types'
 
 interface AccomPackage {
   id: string
+  name: string
   hotel_name: string
   description: string
-  price_per_night_zar: number
-  price_per_night_usd: number
+  price_zar: number
+  price_usd: number
+  nights: number
   total_rooms: number
   booked_count: number
   amenities: string[]
@@ -29,11 +31,11 @@ export default function Step3Accommodation({ form, update, onNext, onBack }: Pro
     const cfg = window.awsisaReg
     if (!cfg?.supabaseUrl) { setLoading(false); return }
 
-    fetch(`${cfg.supabaseUrl}/rest/v1/accommodation_packages?is_active=eq.true&order=price_per_night_zar.asc`, {
+    fetch(`${cfg.supabaseUrl}/rest/v1/accommodation_packages?is_active=eq.true&order=price_zar.asc`, {
       headers: { apikey: cfg.supabaseKey, Authorization: `Bearer ${cfg.supabaseKey}` },
     })
       .then(r => r.json())
-      .then((data: AccomPackage[]) => setPackages(data))
+      .then((data: unknown) => { if (Array.isArray(data)) setPackages(data) })
       .catch(() => {/* show empty state */})
       .finally(() => setLoading(false))
   }, [])
@@ -116,7 +118,7 @@ export default function Step3Accommodation({ form, update, onNext, onBack }: Pro
                 const soldOut   = available <= 0
                 const selected  = form.accommodation_package_id === pkg.id
                 const amenities = Array.isArray(pkg.amenities) ? pkg.amenities : JSON.parse(pkg.amenities || '[]')
-                const total     = pkg.price_per_night_zar * nights
+                const pkgNights = pkg.nights || nights
 
                 return (
                   <button
@@ -147,9 +149,9 @@ export default function Step3Accommodation({ form, update, onNext, onBack }: Pro
                         </div>
                       </div>
                       <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                        <div style={{ fontSize: '.75rem', color: '#94A3B8' }}>R {pkg.price_per_night_zar.toLocaleString()}/night × {nights} nights</div>
-                        <div style={{ fontWeight: 800, fontSize: '1.25rem', color: '#0D9488' }}>R {total.toLocaleString()}</div>
-                        <div style={{ fontSize: '.7rem', color: '#94A3B8' }}>~${(pkg.price_per_night_usd * nights).toLocaleString()} USD total</div>
+                        <div style={{ fontSize: '.75rem', color: '#94A3B8' }}>{pkgNights} nights</div>
+                        <div style={{ fontWeight: 800, fontSize: '1.25rem', color: '#0D9488' }}>R {pkg.price_zar.toLocaleString()}</div>
+                        {pkg.price_usd > 0 && <div style={{ fontSize: '.7rem', color: '#94A3B8' }}>~${pkg.price_usd.toLocaleString()} USD</div>}
                         {!soldOut && available <= 15 && (
                           <div style={{ fontSize: '.7rem', color: '#F59E0B', fontWeight: 700, marginTop: '.25rem' }}>Only {available} left</div>
                         )}
