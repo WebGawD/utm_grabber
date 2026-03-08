@@ -74,15 +74,13 @@ add_action( 'rest_api_init', 'awsisa_register_delegate_routes' );
  */
 function awsisa_delegate_safe_fields( $delegate ) {
 	return array(
-		'id'             => $delegate['id']             ?? '',
-		'first_name'     => $delegate['first_name']     ?? '',
-		'last_name'      => $delegate['last_name']      ?? '',
-		'email'          => $delegate['email']          ?? '',
-		'organisation'   => $delegate['organisation']   ?? '',
-		'delegate_type'  => $delegate['delegate_type']  ?? '',
-		'country'        => $delegate['country']        ?? '',
-		'qr_code_token'  => $delegate['qr_code_token']  ?? '',
-		'seat_reference' => $delegate['seat_reference'] ?? null,
+		'id'            => $delegate['id']            ?? '',
+		'first_name'    => $delegate['first_name']    ?? '',
+		'last_name'     => $delegate['last_name']     ?? '',
+		'email'         => $delegate['email']         ?? '',
+		'organisation'  => $delegate['organisation']  ?? '',
+		'delegate_type' => $delegate['delegate_type'] ?? '',
+		'qr_code_token' => $delegate['qr_code_token'] ?? '',
 	);
 }
 
@@ -291,11 +289,19 @@ function awsisa_delegate_verify_otp( WP_REST_Request $request ) {
 		'GET',
 		array(),
 		'email=eq.' . rawurlencode( $email )
-			. '&select=id,first_name,last_name,email,organisation,delegate_type,country,qr_code_token,seat_reference'
+			. '&select=id,first_name,last_name,email,organisation,delegate_type,qr_code_token'
 			. '&limit=1'
 	);
 
-	if ( is_wp_error( $delegate_rows ) || empty( $delegate_rows[0] ) ) {
+	if ( is_wp_error( $delegate_rows ) ) {
+		return new WP_Error(
+			'supabase_error',
+			$delegate_rows->get_error_message(),
+			array( 'status' => 500 )
+		);
+	}
+
+	if ( empty( $delegate_rows[0] ) ) {
 		return new WP_Error(
 			'delegate_not_found',
 			__( 'Delegate account not found.', 'awsisa-events' ),
@@ -340,7 +346,7 @@ function awsisa_delegate_qr_lookup( WP_REST_Request $request ) {
 		'GET',
 		array(),
 		'qr_code_token=eq.' . rawurlencode( $token )
-			. '&select=id,first_name,last_name,email,organisation,delegate_type,country,qr_code_token,seat_reference'
+			. '&select=id,first_name,last_name,email,organisation,delegate_type,qr_code_token'
 			. '&limit=1'
 	);
 
