@@ -102,7 +102,7 @@ function awsisa_fallback_nav() {
 		<li><a href="<?php echo esc_url( home_url( '/speakers/' ) ); ?>"><?php esc_html_e( 'Speakers', 'awsisa' ); ?></a></li>
 		<li><a href="<?php echo esc_url( home_url( '/accommodation/' ) ); ?>"><?php esc_html_e( 'Accommodation', 'awsisa' ); ?></a></li>
 		<li><a href="<?php echo esc_url( home_url( '/sponsors/' ) ); ?>"><?php esc_html_e( 'Sponsors', 'awsisa' ); ?></a></li>
-		<li><a href="<?php echo esc_url( home_url( '/donate/' ) ); ?>"><?php esc_html_e( 'Legacy', 'awsisa' ); ?></a></li>
+		<li><a href="<?php echo esc_url( home_url( '/legacy/' ) ); ?>"><?php esc_html_e( 'Legacy', 'awsisa' ); ?></a></li>
 		<li><a href="<?php echo esc_url( home_url( '/swag-bag/' ) ); ?>"><?php esc_html_e( 'Swag Bag', 'awsisa' ); ?></a></li>
 		<li><a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>"><?php esc_html_e( 'Contact', 'awsisa' ); ?></a></li>
 	</ul>
