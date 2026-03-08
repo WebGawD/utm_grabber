@@ -20,8 +20,12 @@ const DELEGATE_LABELS: Record<string, string> = {
 }
 
 export default function Step4Review({ form, onBack, onSuccess }: Props) {
-  const [loading, setLoading]   = useState(false)
-  const [error, setError]       = useState<string | null>(null)
+  const [loading, setLoading]               = useState(false)
+  const [error, setError]                   = useState<string | null>(null)
+  // Local POPIA state — Step4Review doesn't receive update() so we manage consent here
+  const [popiaConsent, setPopiaConsent]     = useState(false)
+  const [popiaMarketing, setPopiaMarketing] = useState(false)
+  const [popiaPublic, setPopiaPublic]       = useState(false)
 
   const countryName = COUNTRIES.find(c => c.code === form.country)?.name ?? form.country
   const pricing     = window.awsisaReg?.pricing ?? {}
@@ -29,6 +33,12 @@ export default function Step4Review({ form, onBack, onSuccess }: Props) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!popiaConsent) {
+      setError('Please accept the required POPIA consent before submitting.')
+      return
+    }
+
     setLoading(true)
     setError(null)
 
@@ -52,12 +62,14 @@ export default function Step4Review({ form, onBack, onSuccess }: Props) {
         accommodation_check_in:   form.accommodation_check_in || null,
         accommodation_check_out:  form.accommodation_check_out || null,
         accommodation_notes:      form.accommodation_notes || null,
-        popia_data:               form.popia_data,
-        popia_marketing:          form.popia_marketing,
-        popia_profile_public:     form.popia_profile_public,
+        // Field names matching the backend (rest-api.php awsisa_validate_registration)
+        popia_consent:            popiaConsent,
+        marketing_consent:        popiaMarketing,
+        profile_public:           popiaPublic,
       }
 
-      const res = await fetch(`${cfg.restUrl}/register`, {
+      // restUrl already ends with '/' from wp_localize_script, so no extra slash needed
+      const res = await fetch(`${cfg.restUrl}register`, {
         method:  'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -69,7 +81,10 @@ export default function Step4Review({ form, onBack, onSuccess }: Props) {
       const json = await res.json()
 
       if (!res.ok) {
-        setError(json.message ?? 'Registration failed. Please try again.')
+        // Surface actual API validation errors
+        const apiErrors: string[] = json.errors ?? []
+        const apiMessage: string  = json.message ?? ''
+        setError(apiErrors.length ? apiErrors.join(' · ') : (apiMessage || 'Registration failed. Please try again.'))
         return
       }
 
@@ -131,21 +146,15 @@ export default function Step4Review({ form, onBack, onSuccess }: Props) {
 
       </div>
 
-      {/* POPIA consent */}
+      {/* POPIA consent — local state, properly wired */}
       <div className="popia-block" style={{ marginBottom: '1.5rem' }}>
         <p style={{ fontSize: '.85rem', fontWeight: 700, color: '#0F172A', margin: '0 0 .75rem' }}>Privacy &amp; Consent (POPIA)</p>
 
         <label style={consentRow}>
           <input
             type="checkbox"
-            checked={form.popia_data}
-            onChange={e => {/* handled in parent — re-use update via form prop */
-              // direct DOM update since we don't have update here; parent controls form state
-              // We pass back via submission, but need the checkbox to be checked
-              // Workaround: use a local ref — simpler to just note field is required
-              void e
-            }}
-            required
+            checked={popiaConsent}
+            onChange={e => setPopiaConsent(e.target.checked)}
             style={{ accentColor: '#0D9488', marginTop: 2, flexShrink: 0 }}
           />
           <span style={{ fontSize: '.8rem', color: '#374151' }}>
@@ -157,8 +166,8 @@ export default function Step4Review({ form, onBack, onSuccess }: Props) {
         <label style={{ ...consentRow, marginTop: '.625rem' }}>
           <input
             type="checkbox"
-            checked={form.popia_marketing}
-            onChange={() => {/* optional */}}
+            checked={popiaMarketing}
+            onChange={e => setPopiaMarketing(e.target.checked)}
             style={{ accentColor: '#0D9488', marginTop: 2, flexShrink: 0 }}
           />
           <span style={{ fontSize: '.8rem', color: '#374151' }}>
@@ -169,8 +178,8 @@ export default function Step4Review({ form, onBack, onSuccess }: Props) {
         <label style={{ ...consentRow, marginTop: '.625rem' }}>
           <input
             type="checkbox"
-            checked={form.popia_profile_public}
-            onChange={() => {/* optional */}}
+            checked={popiaPublic}
+            onChange={e => setPopiaPublic(e.target.checked)}
             style={{ accentColor: '#0D9488', marginTop: 2, flexShrink: 0 }}
           />
           <span style={{ fontSize: '.8rem', color: '#374151' }}>
@@ -189,7 +198,7 @@ export default function Step4Review({ form, onBack, onSuccess }: Props) {
         <button type="button" onClick={onBack} className="btn btn--outline" style={{ flex: 1 }} disabled={loading}>
           ← Back
         </button>
-        <button type="submit" className="btn btn--primary" style={{ flex: 2 }} disabled={loading}>
+        <button type="submit" className="btn btn--primary" style={{ flex: 2 }} disabled={loading || !popiaConsent}>
           {loading ? 'Submitting…' : 'Submit Registration ✓'}
         </button>
       </div>

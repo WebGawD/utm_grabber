@@ -20,7 +20,7 @@ wp_enqueue_script( 'awsisa-reg-app', $reg_app_js, array(), '1.0.0', true );
 wp_localize_script( 'awsisa-reg-app', 'awsisaReg', array(
 	'supabaseUrl' => AWSISA_SUPABASE_URL,
 	'supabaseKey' => AWSISA_SUPABASE_ANON_KEY,
-	'restUrl'     => esc_url_raw( rest_url( 'awsisa/v1/' ) ),
+	'restUrl'     => esc_url_raw( trailingslashit( rest_url( 'awsisa/v1' ) ) ),
 	'nonce'       => wp_create_nonce( 'awsisa_rest' ),
 	'successUrl'  => esc_url( home_url( '/register/success/' ) ),
 	'privacyUrl'  => esc_url( home_url( '/privacy-policy/' ) ),
