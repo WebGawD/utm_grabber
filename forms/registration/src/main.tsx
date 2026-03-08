@@ -2,7 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import RegistrationApp from './RegistrationApp'
 
-const el = document.getElementById('registration-app')
+const el = document.getElementById('awsisa-registration-app')
 if (el) {
   createRoot(el).render(
     <StrictMode>
