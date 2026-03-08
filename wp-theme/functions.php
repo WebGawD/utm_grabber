@@ -520,3 +520,39 @@ function awsisa_disable_gutenberg_for_cpts( $use_block_editor, $post_type ) {
 	return $use_block_editor;
 }
 add_filter( 'use_block_editor_for_post_type', 'awsisa_disable_gutenberg_for_cpts', 10, 2 );
+
+// ============================================================
+// TEMP: Deploy About & Legacy templates from GitHub
+// ============================================================
+add_action( 'wp_ajax_awsisa_deploy_templates', function () {
+	check_ajax_referer( 'awsisa_deploy', 'nonce' );
+	if ( ! current_user_can( 'manage_options' ) ) { wp_send_json_error( 'forbidden' ); }
+
+	$theme_dir = get_template_directory();
+	$branch    = 'claude/vigilant-blackburn';
+	$base_url  = 'https://raw.githubusercontent.com/WebGawD/utm_grabber/' . rawurlencode( $branch ) . '/wp-theme/';
+	$results   = array();
+
+	$files = array( 'template-about.php', 'template-legacy.php' );
+	foreach ( $files as $file ) {
+		$response = wp_remote_get( $base_url . $file, array( 'timeout' => 20 ) );
+		if ( is_wp_error( $response ) ) {
+			$results[ $file ] = 'ERR:' . $response->get_error_message();
+			continue;
+		}
+		$code = wp_remote_retrieve_response_code( $response );
+		if ( 200 !== $code ) {
+			$results[ $file ] = 'ERR:HTTP ' . $code;
+			continue;
+		}
+		$body = wp_remote_retrieve_body( $response );
+		$dest = $theme_dir . '/' . $file;
+		if ( false === file_put_contents( $dest, $body ) ) {
+			$results[ $file ] = 'ERR:write failed';
+		} else {
+			$results[ $file ] = filesize( $dest ) . 'B';
+		}
+	}
+
+	wp_send_json_success( $results );
+} );
