@@ -40,6 +40,7 @@ if ( ! defined( 'AWSISA_PEACH_SECRET' ) )         define( 'AWSISA_PEACH_SECRET',
 require_once AWSISA_EVENTS_PATH . 'includes/rest-api.php';
 require_once AWSISA_EVENTS_PATH . 'includes/rest-contact.php';
 require_once AWSISA_EVENTS_PATH . 'includes/rest-swag.php';
+require_once AWSISA_EVENTS_PATH . 'includes/rest-delegate.php';
 require_once AWSISA_EVENTS_PATH . 'includes/shortcodes.php';
 require_once AWSISA_EVENTS_PATH . 'includes/email.php';
 

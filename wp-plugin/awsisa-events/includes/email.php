@@ -366,3 +366,115 @@ function awsisa_email_accomm_html( $d ) {
 	<?php
 	return ob_get_clean();
 }
+
+// ============================================================
+// Delegate PWA — OTP login email
+// ============================================================
+
+/**
+ * Sends a one-time password email to a delegate for PWA login.
+ *
+ * @param string $email      Delegate email address.
+ * @param string $otp_code   Plain-text 6-digit code.
+ * @param string $first_name Delegate first name for personalisation.
+ * @return bool Whether wp_mail() succeeded.
+ */
+function awsisa_send_otp_email( $email, $otp_code, $first_name = '' ) {
+	if ( empty( $email ) || ! is_email( $email ) ) {
+		return false;
+	}
+
+	$subject = __( 'Your Watersan 2026 Access Code', 'awsisa-events' );
+	$message = awsisa_email_otp_html( array(
+		'email'      => $email,
+		'first_name' => $first_name ?: 'Delegate',
+		'otp_code'   => $otp_code,
+	) );
+
+	$headers = array(
+		'Content-Type: text/html; charset=UTF-8',
+		'From: AWSISA Events <events@awsisa-watersan-dialogue.org>',
+	);
+
+	return wp_mail( $email, $subject, $message, $headers );
+}
+
+/**
+ * Builds the HTML body for the OTP login email.
+ *
+ * @param array $d Template variables: email, first_name, otp_code.
+ * @return string HTML email body.
+ */
+function awsisa_email_otp_html( $d ) {
+	ob_start();
+	?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Access Code</title>
+</head>
+<body style="margin:0;padding:0;background:#F8FAFC;font-family:'Inter',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#F8FAFC;padding:40px 0;">
+  <tr><td align="center">
+    <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);">
+
+      <!-- Header -->
+      <tr>
+        <td style="background:linear-gradient(135deg,#115E59,#0D9488);padding:36px 40px 30px;text-align:center;">
+          <div style="font-family:'Outfit',Arial,sans-serif;font-size:22px;font-weight:800;color:#ffffff;margin-bottom:4px;">AWSISA Africa</div>
+          <div style="color:#5EEAD4;font-size:13px;font-weight:600;">Water &amp; Sanitation Dialogue 2026</div>
+        </td>
+      </tr>
+
+      <!-- Body -->
+      <tr>
+        <td style="padding:40px;">
+          <p style="font-size:16px;color:#475569;margin:0 0 8px;">Hi <?php echo esc_html( $d['first_name'] ); ?>,</p>
+          <p style="font-size:15px;color:#475569;margin:0 0 32px;line-height:1.7;">Here is your one-time access code for the <strong>Watersan Dialogue 2026</strong> delegate app. It expires in <strong>15 minutes</strong>.</p>
+
+          <!-- OTP display -->
+          <div style="text-align:center;margin-bottom:36px;">
+            <div style="display:inline-block;background:#F0FDFA;border:2px solid #5EEAD4;border-radius:16px;padding:24px 40px;">
+              <div style="font-size:11px;color:#94A3B8;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;">Your Access Code</div>
+              <div style="font-family:monospace;font-size:42px;font-weight:800;color:#0D9488;letter-spacing:.22em;"><?php echo esc_html( $d['otp_code'] ); ?></div>
+              <div style="font-size:12px;color:#94A3B8;margin-top:10px;">Valid for 15 minutes &middot; Do not share</div>
+            </div>
+          </div>
+
+          <!-- Instructions -->
+          <div style="background:#F8FAFC;border-radius:12px;padding:20px;margin-bottom:28px;">
+            <p style="color:#64748B;font-size:14px;margin:0 0 10px;font-weight:600;">How to use this code:</p>
+            <ol style="color:#64748B;font-size:14px;margin:0;padding-left:20px;line-height:2;">
+              <li>Open the Watersan 2026 delegate app</li>
+              <li>Enter your email address</li>
+              <li>Enter the 6-digit code above</li>
+            </ol>
+          </div>
+
+          <!-- Security notice -->
+          <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:16px 20px;margin-bottom:24px;">
+            <p style="color:#DC2626;font-size:13px;margin:0;line-height:1.6;">&#x1F512; <strong>Security tip:</strong> If you did not request this code, please ignore this email. Your account remains secure.</p>
+          </div>
+
+          <p style="color:#94A3B8;font-size:13px;margin:0;">Questions? Contact us at <a href="mailto:info@lubabalo.co.za" style="color:#0D9488;text-decoration:none;">info@lubabalo.co.za</a></p>
+        </td>
+      </tr>
+
+      <!-- Footer -->
+      <tr>
+        <td style="background:#0F172A;padding:20px 40px;text-align:center;">
+          <p style="color:#64748B;font-size:12px;margin:0;">#AWSISA2026 | ICC Durban | 9&#x2013;12 November 2026</p>
+          <p style="color:#475569;font-size:11px;margin:6px 0 0;">Your personal information is protected under South Africa's POPIA.</p>
+        </td>
+      </tr>
+
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
+	<?php
+	return ob_get_clean();
+}
