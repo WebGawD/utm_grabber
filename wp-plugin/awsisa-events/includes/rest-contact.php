@@ -65,7 +65,7 @@ function awsisa_handle_contact( WP_REST_Request $request ) {
 	);
 	$subject_label = $subject_map[ $subject ] ?? ucfirst( $subject );
 
-	$to      = 'info@afriwater-san.africa';
+	$to      = 'info@lubabalo.co.za';
 	$headers = array(
 		'Content-Type: text/html; charset=UTF-8',
 		'Reply-To: ' . $name . ' <' . $email . '>',
