@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Enqueue the registration React app (built via npm run build in /registration-app).
 $reg_app_js = get_template_directory_uri() . '/assets/js/registration-app.js';
-wp_enqueue_script( 'awsisa-reg-app', $reg_app_js, array(), '1.0.3', true );
+wp_enqueue_script( 'awsisa-reg-app', $reg_app_js, array(), '1.0.4', true );
 wp_localize_script( 'awsisa-reg-app', 'awsisaReg', array(
 	'supabaseUrl' => AWSISA_SUPABASE_URL,
 	'supabaseKey' => AWSISA_SUPABASE_ANON_KEY,
