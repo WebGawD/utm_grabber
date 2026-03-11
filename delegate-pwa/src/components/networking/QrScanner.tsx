@@ -3,14 +3,14 @@ import { Html5Qrcode } from 'html5-qrcode'
 import toast from 'react-hot-toast'
 import { Camera, CheckCircle, XCircle } from 'lucide-react'
 import { WP_REST } from '@/lib/supabase'
-import { supabase } from '@/lib/supabase'
 import type { ScannedContact } from '@/types'
 
 interface Props {
   onContact: (contact: ScannedContact) => void
 }
 
-type ScanState = 'idle' | 'scanning' | 'success' | 'error'
+// 'processing' = camera stopped, waiting for API lookup result
+type ScanState = 'idle' | 'scanning' | 'processing' | 'success' | 'error'
 
 export default function QrScanner({ onContact }: Props) {
   const scannerRef = useRef<Html5Qrcode | null>(null)
@@ -39,7 +39,7 @@ export default function QrScanner({ onContact }: Props) {
           setStarted(false)
           await handleScan(decodedText)
         },
-        () => { /* quiet decode errors */ }
+        () => { /* quiet per-frame decode errors */ }
       )
     } catch (e) {
       const msg = (e as Error).message || 'Camera access denied'
@@ -49,31 +49,36 @@ export default function QrScanner({ onContact }: Props) {
     }
   }
 
-  async function handleScan(token: string) {
-    setState('scanning')
+  async function handleScan(raw: string) {
+    // Show spinner immediately — no more "blank screen" while the lookup runs
+    setState('processing')
+
+    // Extract bare token whether the QR contains a full URL or just the token.
+    // NFC badges encode the full connect URL; printed badges encode just the token.
+    const token = raw.includes('/connect/')
+      ? raw.split('/connect/').pop()!.split('?')[0]
+      : raw.trim()
+
     try {
-      // Log the tap via WP REST
+      // Use the same WP REST endpoint as Connect.tsx — runs with the service
+      // key on the server side so RLS on the delegates table is not an issue.
+      const res = await fetch(`${WP_REST}/delegate/auth/qr/${encodeURIComponent(token)}`)
+      if (!res.ok) throw new Error('Delegate not found')
+      const data = await res.json()
+
+      // Fire-and-forget NFC tap log
       fetch(`${WP_REST}/nfc/tap`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tap_type: 'delegate_view', visitor_token: token }),
       }).catch(() => {})
 
-      // Fetch delegate info by QR token
-      const { data, error: err } = await supabase
-        .from('delegates')
-        .select('id,first_name,last_name,organisation,email,qr_code_token,profile_public')
-        .eq('qr_code_token', token)
-        .single()
-
-      if (err || !data) throw new Error('Delegate not found')
-
       const scanned: ScannedContact = {
         delegateId:   data.id,
         name:         `${data.first_name} ${data.last_name}`.trim(),
         organisation: data.organisation || null,
         email:        data.profile_public ? data.email : null,
-        qrToken:      data.qr_code_token,
+        qrToken:      token,
         scannedAt:    Date.now(),
       }
       setContact(scanned)
@@ -81,7 +86,7 @@ export default function QrScanner({ onContact }: Props) {
       onContact(scanned)
       toast.success(`Connected with ${data.first_name}!`)
     } catch (e) {
-      setError((e as Error).message)
+      setError((e as Error).message || 'Delegate not found')
       setState('error')
     }
   }
@@ -93,6 +98,19 @@ export default function QrScanner({ onContact }: Props) {
     setStarted(false)
   }
 
+  // ── Processing (spinner) ────────────────────────────────────────────────────
+  if (state === 'processing') {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 1rem', textAlign: 'center' }}>
+        <div style={{ width: 52, height: 52, border: '4px solid #E2E8F0', borderTopColor: '#0D9488', borderRadius: '50%', animation: 'qr-spin 0.8s linear infinite', marginBottom: '1.25rem' }} />
+        <p style={{ color: '#0D9488', fontWeight: 700, fontSize: '1rem', margin: '0 0 0.25rem' }}>Looking up delegate…</p>
+        <p style={{ color: '#94A3B8', fontSize: '0.8rem' }}>Just a moment</p>
+        <style>{`@keyframes qr-spin { to { transform: rotate(360deg) } }`}</style>
+      </div>
+    )
+  }
+
+  // ── Success ─────────────────────────────────────────────────────────────────
   if (state === 'success' && contact) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '2rem 1rem', textAlign: 'center' }}>
@@ -118,11 +136,12 @@ export default function QrScanner({ onContact }: Props) {
     )
   }
 
+  // ── Error ────────────────────────────────────────────────────────────────────
   if (state === 'error') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '2rem 1rem', textAlign: 'center' }}>
         <XCircle size={48} style={{ color: '#EF4444', marginBottom: '1rem' }} />
-        <p style={{ color: '#64748B', marginBottom: '1.25rem' }}>{error}</p>
+        <p style={{ color: '#64748B', marginBottom: '1.25rem' }}>{error || 'Could not read this QR code. Please try again.'}</p>
         <button onClick={reset} style={{ background: '#0D9488', color: '#fff', fontWeight: 700, padding: '0.75rem 2rem', borderRadius: '0.75rem', border: 'none', cursor: 'pointer' }}>
           Try Again
         </button>
@@ -130,6 +149,7 @@ export default function QrScanner({ onContact }: Props) {
     )
   }
 
+  // ── Idle / Scanning ──────────────────────────────────────────────────────────
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '1.25rem 1rem' }}>
       {/* Camera viewfinder */}

@@ -10,6 +10,9 @@ export default function LoginPage() {
   const [password, setPassword]   = useState('')
   const [submitting, setSubmitting] = useState(false)
 
+  // Navigate as soon as the shared auth context resolves the user.
+  // This is the ONLY place we navigate — no more premature navigate()
+  // in handleSubmit that races against ProtectedRoute re-running getSession().
   useEffect(() => {
     if (!loading && user) navigate('/dashboard', { replace: true })
   }, [user, loading, navigate])
@@ -21,11 +24,10 @@ export default function LoginPage() {
     const { error } = await signIn(email.trim(), password)
     if (error) {
       toast.error(error.message ?? 'Invalid credentials. Please try again.')
-    } else {
-      toast.success('Welcome back!')
-      navigate('/dashboard', { replace: true })
+      setSubmitting(false)
     }
-    setSubmitting(false)
+    // On success: keep submitting=true so the spinner stays visible while
+    // onAuthStateChange fires and the useEffect above navigates to /dashboard.
   }
 
   return (
