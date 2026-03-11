@@ -138,6 +138,7 @@ export default function ConnectPage() {
           background: '#fff', borderRadius: '1.25rem', padding: '2rem',
           width: '100%', maxWidth: 360,
           boxShadow: '0 24px 64px rgba(0,0,0,0.35)',
+          colorScheme: 'light',
         }}>
 
           {/* Avatar + info */}
