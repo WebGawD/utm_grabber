@@ -14,6 +14,7 @@ import AlertsPage     from '@/pages/Alerts'
 import SponsorsPage   from '@/pages/Sponsors'
 import SwagBagPage    from '@/pages/SwagBag'
 import ReportsPage    from '@/pages/Reports'
+import BadgePrintPage from '@/pages/BadgePrint'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
@@ -72,6 +73,7 @@ export default function App() {
           <Route path="sponsors"   element={<SponsorsPage />} />
           <Route path="swag-bag"   element={<SwagBagPage />} />
           <Route path="reports"    element={<ReportsPage />} />
+          <Route path="badges"     element={<BadgePrintPage />} />
         </Route>
 
         {/* 404 */}

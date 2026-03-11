@@ -2,7 +2,7 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import {
   LayoutDashboard, QrCode, Users, Bell, Building2,
-  Gift, LogOut, Menu, Wifi, WifiOff, AlertCircle, BarChart2,
+  Gift, LogOut, Menu, Wifi, WifiOff, AlertCircle, BarChart2, Printer,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { getQueueSize } from '@/hooks/useOfflineQueue'
@@ -16,6 +16,7 @@ const navItems = [
   { to: '/sponsors',  icon: Building2,        label: 'Sponsors' },
   { to: '/swag-bag',  icon: Gift,             label: 'Swag Bag' },
   { to: '/reports',   icon: BarChart2,        label: 'Reports' },
+  { to: '/badges',    icon: Printer,          label: 'Badge Print' },
 ]
 
 export default function AdminLayout() {
