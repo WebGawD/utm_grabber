@@ -2,6 +2,12 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "delegate-pwa",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "delegate-pwa", "run", "dev"],
+      "port": 5177
+    },
+    {
       "name": "admin-pwa",
       "runtimeExecutable": "/bin/bash",
       "runtimeArgs": ["scripts/start-admin-pwa.sh"],
