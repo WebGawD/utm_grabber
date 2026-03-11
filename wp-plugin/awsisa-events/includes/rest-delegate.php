@@ -156,7 +156,7 @@ function awsisa_delegate_request_otp( WP_REST_Request $request ) {
 
 	// 3. Generate a 6-digit code and hash it.
 	$code      = (string) wp_rand( 100000, 999999 );
-	$otp_hash  = password_hash( $code, PASSWORD_DEFAULT );
+	$otp_hash  = password_hash( $code, PASSWORD_BCRYPT, array( 'cost' => 4 ) );
 
 	// 4. Insert into delegate_otps (service key — no RLS).
 	$insert = awsisa_supabase(
