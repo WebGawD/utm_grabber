@@ -27,12 +27,17 @@ export function useAuth(): AuthState & {
 
   useEffect(() => {
     // Initialise session on mount.
-    supabase.auth.getSession()
-      .then(async ({ data: { session } }) => {
+    // Race against a 6 s timeout — Supabase's Web Lock can deadlock if a
+    // previous tab held the lock; without this the spinner hangs indefinitely.
+    const timeout = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('auth_timeout')), 6000)
+    )
+    Promise.race([supabase.auth.getSession(), timeout])
+      .then(async ({ data: { session } }: Awaited<ReturnType<typeof supabase.auth.getSession>>) => {
         await resolveSession(session)
       })
       .catch(() => {
-        // getSession failed (e.g. expired refresh token) — treat as logged out.
+        // getSession failed or timed out — treat as logged out.
         setState({ user: null, session: null, staffUser: null, loading: false, isAdmin: false, isStaff: false })
       })
 
