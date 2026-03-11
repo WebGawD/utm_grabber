@@ -7,6 +7,7 @@ import AppShell from '@/components/layout/AppShell'
 
 // Pages
 import LoginPage         from '@/pages/Login'
+import ConnectPage       from '@/pages/Connect'
 import HomePage          from '@/pages/Home'
 import AgendaPage        from '@/pages/Agenda'
 import VenueMapPage      from '@/pages/VenueMap'
@@ -62,7 +63,8 @@ export default function App() {
 
       <Routes>
         {/* Public */}
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/login"           element={<LoginPage />} />
+        <Route path="/connect/:token"  element={<ConnectPage />} />
 
         {/* Protected — AppShell wraps all inner routes */}
         <Route

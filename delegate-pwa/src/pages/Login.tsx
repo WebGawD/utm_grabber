@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { Mail, ArrowRight, ArrowLeft, KeyRound, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useAuth } from '@/hooks/useAuth'
@@ -25,7 +25,9 @@ function mapDelegate(d: Record<string, unknown>): DelegateSession {
 
 export default function LoginPage() {
   const { login, isLoggedIn } = useAuth()
-  const navigate = useNavigate()
+  const navigate   = useNavigate()
+  const location   = useLocation()
+  const returnTo   = (location.state as { returnTo?: string } | null)?.returnTo || '/home'
   const [stage, setStage] = useState<Stage>('email')
   const [email, setEmail] = useState('')
   const [otp, setOtp]     = useState('')
@@ -34,8 +36,8 @@ export default function LoginPage() {
 
   // Redirect if already logged in
   useEffect(() => {
-    if (isLoggedIn) navigate('/home', { replace: true })
-  }, [isLoggedIn, navigate])
+    if (isLoggedIn) navigate(returnTo, { replace: true })
+  }, [isLoggedIn, navigate, returnTo])
 
   // Check for QR token in URL on mount
   useEffect(() => {
@@ -53,7 +55,7 @@ export default function LoginPage() {
       if (!res.ok) throw new Error('QR code not recognised')
       const { delegate } = await res.json()
       login(mapDelegate(delegate))
-      navigate('/home', { replace: true })
+      navigate(returnTo, { replace: true })
     } catch (e) {
       setError((e as Error).message)
       setStage('email')
@@ -102,7 +104,7 @@ export default function LoginPage() {
       if (!res.ok || !j.delegate) throw new Error(j.message || 'Invalid or expired code.')
       login(mapDelegate(j.delegate))
       toast.success(`Welcome, ${j.delegate.first_name}!`)
-      navigate('/home', { replace: true })
+      navigate(returnTo, { replace: true })
     } catch (e) {
       setError((e as Error).message)
       setStage('otp')
