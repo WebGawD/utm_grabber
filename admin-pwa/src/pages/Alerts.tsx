@@ -59,7 +59,7 @@ export default function AlertsPage() {
         body,
         audience,
         channels: selectedChannels,
-        status:   asDraft ? 'draft' : 'sending',
+        status:   asDraft ? 'draft' : 'sent',
       })
       .select()
       .single()
