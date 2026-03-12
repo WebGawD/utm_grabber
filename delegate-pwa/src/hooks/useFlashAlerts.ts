@@ -39,7 +39,7 @@ export function useFlashAlerts() {
         }
       })
 
-    // Subscribe to new alerts
+    // Subscribe to new alerts (INSERT) and removals (DELETE)
     channelRef.current = supabase
       .channel('delegate-flash-alerts')
       .on(
@@ -56,6 +56,19 @@ export function useFlashAlerts() {
               style: { background: '#0F172A', color: '#F1F5F9', border: '1px solid #0D9488' },
             })
           }
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'flash_alerts' },
+        (payload) => {
+          const deletedId = (payload.old as { id: string }).id
+          setAlerts(prev => {
+            const next = prev.filter(a => a.id !== deletedId)
+            const readIds = getReadIds()
+            setUnread(next.filter(a => !readIds.has(a.id)).length)
+            return next
+          })
         }
       )
       .subscribe()
