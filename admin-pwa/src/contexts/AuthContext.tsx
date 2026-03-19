@@ -64,29 +64,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return
     }
 
+    // Fetch staff profile — keep user logged in even if this query fails
+    // (network blip, slow server). Access-controlled pages will just see
+    // isAdmin/isStaff = false until the next successful resolution.
+    let staffUser: StaffUser | null = null
     try {
-      const { data: staffUser } = await supabase
+      const { data } = await supabase
         .from('staff_users')
         .select('*')
         .eq('id', session.user.id)
         .single()
-
-      setState({
-        user:      session.user,
-        session,
-        staffUser: staffUser ?? null,
-        loading:   false,
-        isAdmin:   ['admin', 'super_admin'].includes(staffUser?.role ?? ''),
-        isStaff:   ['staff', 'admin', 'super_admin', 'volunteer'].includes(staffUser?.role ?? ''),
-      })
+      staffUser = data ?? null
     } catch {
-      setState({ user: null, session: null, staffUser: null, loading: false, isAdmin: false, isStaff: false })
+      // Network error — session stays valid, staff privileges not loaded
     }
+
+    setState({
+      user:      session.user,
+      session,
+      staffUser,
+      loading:   false,
+      isAdmin:   ['admin', 'super_admin'].includes(staffUser?.role ?? ''),
+      isStaff:   ['staff', 'admin', 'super_admin', 'volunteer'].includes(staffUser?.role ?? ''),
+    })
   }
 
   async function signIn(email: string, password: string) {
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    return { error: error as Error | null }
+    // Race signInWithPassword against a 10 s timeout — the Supabase Web Lock
+    // can deadlock if another tab still holds the lock from a prior page load.
+    const timeout = new Promise<{ error: Error }>(resolve =>
+      setTimeout(() => resolve({ error: new Error('Sign-in timed out. Please try again.') }), 10000)
+    )
+    const result = await Promise.race([
+      supabase.auth.signInWithPassword({ email, password })
+        .then(r => ({ error: r.error as Error | null })),
+      timeout,
+    ])
+    return result
   }
 
   async function signOut() {

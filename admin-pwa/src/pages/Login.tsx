@@ -11,11 +11,17 @@ export default function LoginPage() {
   const [submitting, setSubmitting] = useState(false)
 
   // Navigate as soon as the shared auth context resolves the user.
-  // This is the ONLY place we navigate — no more premature navigate()
-  // in handleSubmit that races against ProtectedRoute re-running getSession().
+  // Also reset the spinner if auth resolved but user is null (e.g. staff_users
+  // query failed or the signed-in account has no staff record).
   useEffect(() => {
-    if (!loading && user) navigate('/dashboard', { replace: true })
-  }, [user, loading, navigate])
+    if (loading) return
+    if (user) {
+      navigate('/dashboard', { replace: true })
+    } else if (submitting) {
+      setSubmitting(false)
+      toast.error('Sign-in failed. Please try again.')
+    }
+  }, [user, loading]) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
